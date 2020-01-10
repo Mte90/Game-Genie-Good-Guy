@@ -6,7 +6,7 @@ Game Genie Good Guy is based on Game Genie Guy:
 
 That tool is written in BCX-BASIC and the source code is [released with the Windows executable](https://www.romhacking.net/utilities/1054/) compatible with Game Boy/Game Gear/Genesis/Mega Drive/NES/SNES roms and generate rom patched ready to be shared.
 
-The idea of the new project is to get that tool (or the patching engine) running on Linux with 0 experience on BASIC and C code, with a bit of knowledge with code compilation.
+The idea of the new project is to get that tool (or the patching engine) running on Linux with 0 experience on BASIC and C/C++ code, with a bit of knowledge with code compilation.
 
 ## Notes from original version
 
@@ -19,8 +19,9 @@ The idea of the new project is to get that tool (or the patching engine) running
 ## Steps
 
 * [UbxBasic for Linux](https://sourceforge.net/projects/ubxbasic/files/) to compile BASIC in C
-* Understand how that BCX-BASIC language works to patch [the original code](https://github.com/Mte90/Game-Genie-Good-Guy/blob/master/original/GGGuy.bas)
+* Understand how that [BCX-BASIC language](https://www.bcxbasiccoders.com/webhelp/BCXHelp.htm) works to patch [the original code](https://github.com/Mte90/Game-Genie-Good-Guy/blob/master/original/GGGuy.bas)
 * Change that code to get cli support instead of GUI
+* Some code optimizations
 * Patch manually C code for compilers issues
 
 # Parameters
@@ -42,15 +43,15 @@ Use that numbers to define the rom type
 
 Multiple cheat code can be concatenated with `+` or new lines.
 
-## Compile
+## Compile both versions
 
     ./compile.sh
 
 This script will patch the C code for the various errors on converting it.
 
-### Convert new BASIC version to C
+### Convert new BASIC version to C/C++
 
-    UbxBasic GGGG && InsertOptArg GGGG.c
+    ./generate.sh
 
 ### Check if the roms are different
 

@@ -3,9 +3,29 @@
 // ----------------------------------------------------------------------
 //                 BCX (c) 1999 - 2009 by Kevin Diggins
 // *********************************************************************
-//              Translated for compiling with a C Compiler
+//              Translated for compiling with a C++ Compiler
 //                            On a nix OS
 // *********************************************************************
+// Additional lines may be needed
+#if defined( __cplusplus )
+#define overloaded
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+#include <locale>
+#include <algorithm>
+#include <vector>
+typedef std::string::value_type charT;
+typedef std::string stdstr;
+#define _X(y) y
+using namespace std;
+#ifdef UNICODE
+typedef std::wstring _string;
+#else
+typedef std::string _string;
+#endif
+#endif
 #include <wchar.h>      // dos/linux 
 #include <ctype.h>      // dos/linux
 #include <fcntl.h>      // dos/linux
@@ -54,6 +74,9 @@ typedef unsigned long DWORD, ULONG, *PDWORD, *LPDWORD, *PULONG;
 
 
 #define stricmp strcasecmp
+#ifndef __cplusplus
+#error A C++ compiler is required
+#endif
 #include "./include/functions.c"
 
 // *************************************************
@@ -96,31 +119,48 @@ gchar g_gerr[2048];  // global for glib errors
 //               Standard Prototypes
 // *************************************************
 
-gboolean gCopyFile (const gchar*, const gchar*, gboolean );
+gboolean gCopyFile (const gchar*, const gchar*, gboolean = 0 );
 int     iMatch (const char*, const char*, int);
 #define iMatchLft(A,B) iMatch(A,B, 0)
 #define iMatchWrd(A,B) iMatch(A,B, 1)
 #define iMatchRgt(A,B) iMatch(A,B, 2)
 int     str_cmp(const char*, const char*);
-char* BCX_TmpStr(size_t, size_t , int );
+char*   BCX_TmpStr(size_t, size_t = 0, int = 1);
 char*   lcase (const char*);
+stdstr lcase(stdstr &, int = 0);
+charT lower(charT arg)
+{
+    return std::use_facet<std::ctype<charT> >(std::locale()).tolower(arg);
+}
 char*   ucase (const char*);
-char* mid (const char*, int, int );
+stdstr ucase(stdstr &, int = 0);
+charT upper(charT arg)
+{
+    return std::use_facet<std::ctype<charT> >(std::locale()).toupper(arg);
+}
+std::string   mid (std::string, size_t, int = -1);
+char*   mid (const char*, int, int = -1);
 char*   _strupr_(char *);
 char*   _strlwr_(char *);
+std::string   trim (std::string);
 char*   trim (const char*);
+std::string   left (std::string, int);
 char*   left (const char*, int);
+std::string   right (std::string, int);
 char*   right (const char*, int);
-char* lpad (const char*, int, int );
+char*   lpad (const char*, int, int = 32);
+stdstr replace(stdstr&, stdstr, stdstr, int = 0);
 char*   replace (const char*, const char*, const char*);
 char*   str (double);
 char*   hex (int);
 char*   Bin (int);
+stdstr   RemoveStr (stdstr, stdstr);
 char*   RemoveStr (const char*, const char*);
 char*   join (int, ... );
 char*   chr(int);
-int InstrRev (const char*, const char*, int , int );
-int instr(const char*, const char*, int , int );
+int     InstrRev (const char*, const char*, int = 0, int = 0);
+int     instr(const char*, const char*, int = 0, int = 0);
+int     instr(std::string, std::string, int = 0, int = 0);
 char    *MakeLCaseTbl(void);
 char    *_stristr_(char*, char*);
 char    *_strstr_(char*, char*);
@@ -128,7 +168,7 @@ int     Bin2Dec (const char*);
 int     Hex2Dec (const char*);
 gboolean Exist(const char*);
 DWORD   lof (const char*);
-int Split (char [][cSizeOfDefaultString], const char*, const char*, int );
+int     Split (char [][cSizeOfDefaultString], const char*, const char*, int = 0);
 char *LowCase;
 static char    LF  [2] = {10, 0}; // Line Feed
 static char    CRLF[3] = {13, 10, 0}; // Carr Rtn & Line Feed
@@ -250,6 +290,10 @@ int str_cmp (const char *a, const char *b)
 }
 
 
+std::string left (std::string s, int length)
+{
+    return s.substr(0, length);
+}
 char *left (const char *S, int length)
 {
     register int tmplen = strlen(S);
@@ -260,6 +304,10 @@ char *left (const char *S, int length)
 }
 
 
+std::string right (std::string s, int length)
+{
+    return s.substr(s.length() - length, length);
+}
 char *right (const char *S, int length)
 {
     int tmplen = strlen(S);
@@ -281,6 +329,12 @@ char *lpad (const char *a, int L, int c)
 }
 
 
+std::string mid (std::string s, size_t start, int length)
+{
+    if (start > s.length() || start < 1)  return "" ;
+    if (length < 0) length = s.length();
+    return s.substr(start - 1, length);
+}
 char *mid (const char *S, int start, int length)
 {
     char *strtmp;
@@ -293,6 +347,12 @@ char *mid (const char *S, int start, int length)
 }
 
 
+std::string trim (std::string str)
+{
+    str.erase(0, str.find_first_not_of(" \t\n\v\r\f"));       //prefixing whitespaces
+    str.erase(str.find_last_not_of(" \t\n\v\r\f") + 1);       //surfixing whitespaces
+    return str;
+}
 char *trim (const char *S)
 {
     if(S[0] == 0) return (char*)S;
@@ -304,6 +364,21 @@ char *trim (const char *S)
 }
 
 
+stdstr replace(stdstr & mane, stdstr match, stdstr change, int f)
+{
+    char* m;
+    char* mt;
+    char* c;
+    char* rv;
+    stdstr s;
+    m = (char*)mane.c_str();
+    mt = (char*)match.c_str();
+    c = (char*)change.c_str();
+    rv = replace(m, mt, c);
+    s = rv;
+    if(f) m = rv;
+    return rv;
+}
 char *replace (const char *src, const char *pat, const char *rep)
 {
     register size_t patsz, repsz, tmpsz, delta;
@@ -367,6 +442,18 @@ int iMatch (const char*  Arg, const char*  MatchStr, int mt)
     }
     return TRUE;
 }
+stdstr ucase(stdstr & m, int f)
+{
+    stdstr s;
+    if(f)
+    {
+        std::transform(m.begin(), m.end(), m.begin(), upper);
+        return s;
+    }
+    s = m;
+    std::transform(s.begin(), s.end(), s.begin(), upper);
+    return s;
+}
 char *ucase (const char *S)
 {
     register char *strtmp = BCX_TmpStr(strlen(S), 1, 1);
@@ -374,6 +461,14 @@ char *ucase (const char *S)
 }
 
 
+stdstr lcase(stdstr & m, int f)
+{
+    stdstr s;
+    s = m;
+    std::transform(s.begin(), s.end(), s.begin(), lower);
+    if(f) m = s;
+    return s;
+}
 char *lcase (const char *S)
 {
     register char *strtmp = BCX_TmpStr(strlen(S), 1, 1);
@@ -381,6 +476,16 @@ char *lcase (const char *S)
 }
 
 
+stdstr RemoveStr(stdstr a, stdstr b)
+{
+    char *c, *d, *rv;
+    stdstr s;
+    c = (char*)a.c_str();
+    d = (char*)b.c_str();
+    rv = RemoveStr(c, d);
+    s = rv;
+    return s;
+}
 char *RemoveStr (const char *a, const char *b)
 {
     char *strtmp, *p, *d;
@@ -486,6 +591,14 @@ int InstrRev (const char *s, const char *p, int os, int sens)
 }
 
 
+int instr(std::string mane, std::string match, int offset, int sensflag)
+{
+    char* m1;
+    char* m2;
+    m1 = (char*)mane.c_str();
+    m2 = (char*)match.c_str();
+    return instr(m1, m2, offset, sensflag);
+}
 int instr(const char* mane, const char* match, int offset, int sensflag)
 {
     register char *s;
@@ -500,13 +613,17 @@ int instr(const char* mane, const char* match, int offset, int sensflag)
 
 char  *MakeLCaseTbl (void)
 {
-    static char tbl[256];
-    if(!tbl['a'])
-    {
-        int i;
-        for (i = 0; i < 256; i++)
-            tbl[i] = (char)(int)tolower(i);
-    }
+    static char tbl[257];
+    string s;
+    int i;
+    for (i = 0; i < 256; i++)
+        tbl[i] = i;
+    tbl[0] = 1;
+    tbl[256] = 0;
+    s = tbl;
+    s = lcase(s);
+    strcpy(tbl, s.c_str());
+    tbl[0] = 0;
     return tbl;
 }
 
@@ -682,9 +799,9 @@ int main(int argc, char *argv[])
     }
     strcpy(Code, replace(Code, "-", ""));
     strcpy(Code, replace(Code, "+", LF));
-    Codes = Split( Line, Code, LF,  0);
+    Codes = Split( Line, Code, LF);
     printf("%s%s\n", "Codes to inject: ", str( Codes));
-    strcpy(Bit, lcase(right(File1, strlen(File1) - InstrRev(File1, ".",  0,  0))));
+    strcpy(Bit, lcase(right(File1, strlen(File1) - InstrRev(File1, "."))));
     printf("%s%s\n", "Rom to patch: ", File1);
     printf("%s%s\n", "Patch at: ", File2);
     if(Exist(File2))
@@ -704,7 +821,7 @@ int main(int argc, char *argv[])
             strcpy(Code, Line[Lnum]);
             printf("%s%s\n", "Parsing code: ", Code);
             *Dec = 0;
-            if(instr(Code, ":",  0,  0))
+            if(instr(Code, ":"))
             {
                 if(str_cmp(Bit, "pce") == 0 || ( str_cmp(Bit, "sms") == 0 && lof(File1) % 1024))
                 {
