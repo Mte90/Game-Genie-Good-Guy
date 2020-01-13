@@ -8,6 +8,8 @@ That tool is written in BCX-BASIC and the source code is [released with the Wind
 
 The idea of the new project is to get that tool (or the patching engine) running on Linux with 0 experience on BASIC and C/C++ code, with a bit of knowledge with code compilation.
 
+![](https://user-images.githubusercontent.com/403283/72270410-65ede200-3625-11ea-8871-382016954a57.png)
+
 ## Notes from original version
 
 > Master System and PC Engine support added. Only use the codes from the supplied text files. Pro Action Replay codes are not supported.
@@ -20,9 +22,10 @@ The idea of the new project is to get that tool (or the patching engine) running
 
 * [UbxBasic for Linux](https://sourceforge.net/projects/ubxbasic/files/) to compile BASIC in C
 * Understand how that [BCX-BASIC language](https://www.bcxbasiccoders.com/webhelp/BCXHelp.htm) works to patch [the original code](https://github.com/Mte90/Game-Genie-Good-Guy/blob/master/original/GGGuy.bas)
-* Change that code to get cli support instead of GUI
-* Some code optimizations
-* Patch manually C code for compilers issues
+* Change the BASIC code to get cli support instead of GUI
+* Some code optimizations in the BASIC version
+* Patch manually [C/C++ code for compilers issues](https://github.com/Mte90/Game-Genie-Good-Guy/blob/master/generate.sh)
+* Create a [GUI with IPS patch generator](https://github.com/Mte90/Game-Genie-Good-Guy/tree/master/gui)
 
 # Parameters
 
@@ -42,6 +45,10 @@ Use that numbers to define the rom type
     ./GGGG "AJDV-4A4L+963B-4JAC" 2 ./rom.md ./rom-new.md
 
 Multiple cheat code can be concatenated with `+` or new lines.
+
+    ./gui/app.py
+
+Open the UI version.
 
 ## Compile both versions
 
