@@ -22,7 +22,7 @@ The idea of the new project is to get that tool (or the patching engine) running
 
 * [UbxBasic for Linux](https://sourceforge.net/projects/ubxbasic/files/) to compile BASIC in C
 * Understand how that [BCX-BASIC language](https://www.bcxbasiccoders.com/webhelp/BCXHelp.htm) works to patch [the original code](https://github.com/Mte90/Game-Genie-Good-Guy/blob/master/original/GGGuy.bas)
-* Change the BASIC code to get cli support instead of GUI
+* Rewrite the [BASIC code](https://github.com/Mte90/Game-Genie-Good-Guy/blob/master/GGGG.bas) to get cli support
 * Some code optimizations in the BASIC version
 * Patch manually [C/C++ code for compilers issues](https://github.com/Mte90/Game-Genie-Good-Guy/blob/master/generate.sh)
 * Create a [GUI with IPS patch generator](https://github.com/Mte90/Game-Genie-Good-Guy/tree/master/gui)
