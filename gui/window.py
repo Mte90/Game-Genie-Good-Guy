@@ -63,6 +63,9 @@ class Ui_MainWindow(object):
         self.groupBox_4.setObjectName("groupBox_4")
         self.codes = QtWidgets.QTextEdit(self.groupBox_4)
         self.codes.setGeometry(QtCore.QRect(10, 30, 311, 81))
+        font = QtGui.QFont()
+        font.setFamily("Monospace")
+        self.codes.setFont(font)
         self.codes.setObjectName("codes")
         MainWindow.setCentralWidget(self.centralwidget)
 
