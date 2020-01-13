@@ -73,6 +73,11 @@
        <height>221</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>Monospace</family>
+      </font>
+     </property>
      <property name="acceptDrops">
       <bool>false</bool>
      </property>

@@ -1,10 +1,8 @@
 #!/usr/bin/python3
-#Initialize PyQT
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-#The fondamental for working with python
-import sys,signal,subprocess
+import sys, signal, subprocess, os
 
 from window import Ui_MainWindow
 
@@ -48,16 +46,18 @@ class MainWindow ( QMainWindow , Ui_MainWindow):
 
     def patch(self):
         rom = str(self.ui.rom.text())
+        name, ext = os.path.splitext(rom)
+        newrom = "{name}-{uid}{ext}".format(name=name, uid='new', ext=ext)
         system = int(self.ui.system.currentIndex()) + 1
         codes = str(self.ui.codes.toPlainText())
         self.settings.setValue("system", system - 1)
         if rom != '':
-            out = subprocess.Popen(['../GGGG', codes, str(system), rom, rom + "1"],
+            out = subprocess.Popen(['./GGGG', codes, str(system), rom, newrom],
                stdout=subprocess.PIPE,
                stderr=subprocess.STDOUT)
             stdout,stderr = out.communicate()
             self.ui.log.clear()
-            self.ui.log.appendPlainText(stdout.decode('ascii'))
+            self.ui.log.appendPlainText(stdout.decode('ascii').strip())
 
     def ips(self):
         pass

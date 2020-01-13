@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'window.ui'
+# Form implementation generated from reading ui file './gui/window.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.1
 #
@@ -30,6 +30,9 @@ class Ui_MainWindow(object):
         self.log = QtWidgets.QPlainTextEdit(self.groupBox_3)
         self.log.setEnabled(True)
         self.log.setGeometry(QtCore.QRect(10, 30, 311, 221))
+        font = QtGui.QFont()
+        font.setFamily("Monospace")
+        self.log.setFont(font)
         self.log.setAcceptDrops(False)
         self.log.setUndoRedoEnabled(False)
         self.log.setObjectName("log")
