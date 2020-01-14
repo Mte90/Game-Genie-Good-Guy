@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-from PyQt5.QtCore import QSettings
+from PyQt5.QtCore import QSettings, QProcess
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QApplication
-import sys, signal, subprocess, os
+import sys, signal, os
 
 from window import Ui_MainWindow
 
@@ -30,6 +30,8 @@ class MainWindow (QMainWindow, Ui_MainWindow):
         self.ui.patch.clicked.connect(self.generateRom)
         self.ui.ips.clicked.connect(self.generateIPS)
         self.ui.log.setReadOnly(True)
+        self.process = QProcess()
+        self.process.readyReadStandardOutput.connect(self.printLog)
         if self.settings.value("rom"):
             self.ui.rom.setText(self.settings.value("rom"))
         if self.settings.value("system"):
@@ -44,6 +46,11 @@ class MainWindow (QMainWindow, Ui_MainWindow):
         self.ui.rom.setText(str(fileName))
         self.settings.setValue("rom", str(fileName))
 
+    def printLog(self):
+        self.ui.log.clear()
+        result = self.process.readAllStandardOutput().data().decode()
+        self.ui.log.appendPlainText(result)
+
     def generateRom(self):
         self.rom = str(self.ui.rom.text())
         name, ext = os.path.splitext(self.rom)
@@ -53,12 +60,7 @@ class MainWindow (QMainWindow, Ui_MainWindow):
         self.settings.setValue("system", system - 1)
         system = str(system)
         if self.rom != '':
-            out = subprocess.Popen(['./GGGG', codes, system, self.rom, self.newrom],
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.STDOUT)
-            stdout, stderr = out.communicate()
-            self.ui.log.clear()
-            self.ui.log.appendPlainText(stdout.decode('ascii').strip())
+            self.process.start('./GGGG "' + codes + '" ' + system + ' "' + self.rom + '" "' + self.newrom + '"')
 
     # Based on https://github.com/fbeaudet/ips.py/blob/master/ips.py
     def generateIPS(self):
