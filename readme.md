@@ -4,9 +4,9 @@ Game Genie Good Guy is based on Game Genie Guy:
 
     This is a small Windows utility for applying Game Genie codes to roms. This saves you the trouble of having to enter them each time the game is played.
 
-That tool is written in BCX-BASIC and the source code is [released with the Windows executable](https://www.romhacking.net/utilities/1054/) compatible with Game Boy/Game Gear/Genesis/Mega Drive/NES/SNES roms and generate rom patched ready to be shared.
+The original tool is written in BCX-BASIC and the source code is [released with the Windows executable](https://www.romhacking.net/utilities/1054/) compatible with Game Boy/Game Gear/Genesis/Mega Drive/NES/SNES roms and generate rom patched ready to be shared (or generate the IPS patch).
 
-The idea of the new project is to get that tool (or the patching engine) running on Linux with 0 experience on BASIC and C/C++ code, with a bit of knowledge with code compilation.
+The idea of the new project is to get that tool (or the patching engine) running on Linux (and replicate the features) with 0 experience on BASIC and C/C++ code, with a bit of knowledge with code compilation.  
 
 ![](https://user-images.githubusercontent.com/403283/72270410-65ede200-3625-11ea-8871-382016954a57.png)
 
