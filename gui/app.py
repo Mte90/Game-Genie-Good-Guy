@@ -61,6 +61,8 @@ class MainWindow (QMainWindow, Ui_MainWindow):
         system = str(system)
         if self.rom != '':
             self.process.start('./GGGG "' + codes + '" ' + system + ' "' + self.rom + '" "' + self.newrom + '"')
+            self.process.waitForFinished();
+            self.process.close();
 
     # Based on https://github.com/fbeaudet/ips.py/blob/master/ips.py
     def generateIPS(self):
