@@ -3,14 +3,6 @@
 # A simple Kdialog interface to Game-Genie-Good-Guy and Flips on Linux
 # Copyright (C) 2024 Tuncay D.
 
-# https://github.com/thingsiplay/Game-Genie-Good-Guy
-# https://www.romhacking.net/utilities/1484/
-#
-# https://github.com/Alcaro/Flips
-# https://www.romhacking.net/utilities/1040/
-#
-# https://gamehacking.org/
-
 script_title='Game-Genie-Good-GuY GUI'
 # Set default append text here. An underscore is added automatically.
 filename_append='patched'

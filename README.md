@@ -1,9 +1,9 @@
-# Game Genie Good Guy
+# Genie
 
 Patch your rom with Game Genie codes
 
 - Author: [Tuncay D.](https://github.com/thingsiplay)
-- Source: [Github](https://github.com/thingsiplay/Game-Genie-Good-Guy)
+- Source: [Github](https://github.com/thingsiplay/genie)
 - License: [GPL-3.0 license](LICENSE)
 
 ## What is this?
@@ -24,7 +24,7 @@ name for "**G**ame **G**enie **G**ood **G**uy".
 2. [Game Genie Good Guy](https://github.com/Mte90/Game-Genie-Good-Guy), 2020:
    Mte90 took the source code and converted it into C language, made it run on
    Linux and added a GUI written in Python with QT on top of it.
-3. [This](https://github.com/thingsiplay/Game-Genie-Good-Guy), 2024: I forked
+3. [This](https://github.com/thingsiplay/genie), 2024: I forked
    this new "enhanced" version and removed most (to me) unnecessary stuff from
    the repository and added my own dialog based GUI.
 
@@ -41,8 +41,8 @@ automate a few steps with a graphical dialog system.
 ### Get the code
 
 ```bash
-git clone "https://github.com/thingsiplay/Game-Genie-Good-Guy"
-cd "Game-Genie-Good-Guy"
+git clone "https://github.com/thingsiplay/genie"
+cd "genie"
 ```
 
 ### Build GGGG
@@ -109,7 +109,7 @@ original file name. The script will also create a little log file as well.
 - [Game Genie Good Guy](https://www.romhacking.net/utilities/1484/) / [Source](https://github.com/Mte90/Game-Genie-Good-Guy)
 - [Flips](https://www.romhacking.net/utilities/1040/) / [Source](https://github.com/Alcaro/Flips)
 
-### Websites
+### Websites with Codes
 
 - [GameHacking](https://gamehacking.org/)
 - [GameGenie](https://www.gamegenie.com/)
