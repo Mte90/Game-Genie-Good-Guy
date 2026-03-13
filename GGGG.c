@@ -19,7 +19,6 @@
 #include <sys/stat.h>
 #include <stdbool.h>    // linux only
 #include <unistd.h>     // linux only
-#include <termios.h>    // linux only
 #include <glib.h>
 #include <gio/gio.h>
 #include <glib/gstdio.h>
