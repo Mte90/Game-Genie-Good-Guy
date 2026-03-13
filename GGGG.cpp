@@ -38,7 +38,6 @@ typedef std::string _string;
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdbool.h>    // linux only
-#include <sys/wait.h>   // linux only
 #include <unistd.h>     // linux only
 #include <termios.h>    // linux only
 #include <glib.h>
