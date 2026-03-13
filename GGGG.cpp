@@ -43,11 +43,9 @@ typedef std::string _string;
 #include <dirent.h>     // linux only
 #include <sys/wait.h>   // linux only
 #include <unistd.h>     // linux only
-#include <dlfcn.h>      // linux only
 #include <termios.h>    // linux only
-#include <gtk/gtk.h>
 #include <glib.h>
-#include <gmodule.h>
+#include <gio/gio.h>
 #include <glib/gstdio.h>
 
 typedef char *PCHAR, *LPCH, *PCH, *NPSTR, *LPSTR, *PSTR;
