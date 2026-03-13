@@ -770,13 +770,10 @@ int main(int argc, char *argv[])
     strcpy(Bit, lcase(right(File1, strlen(File1) - InstrRev(File1, "."))));
     printf("%s%s\n", "Rom to patch: ", File1);
     printf("%s%s\n", "Patch at: ", File2);
-    if(Exist(File2))
+    if((FP2 = fopen(File2, "rb+")) == 0)
     {
-        if((FP2 = fopen(File2, "rb+")) == 0)
-        {
-            fprintf(stderr, (char*)"Can't open file %s\n", File2);
-            exit(1);
-        }
+        fprintf(stderr, "Can't open file %s\n", File2);
+        exit(1);
     }
     printf("%s%s\n", CRLF, "Log:");
     for(Lnum = 0; Lnum <= Codes; Lnum += 1)
