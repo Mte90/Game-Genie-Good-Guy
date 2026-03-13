@@ -25,7 +25,6 @@
 #include <unistd.h>     // linux only
 #include <termios.h>    // linux only
 #include <glib.h>
-#include <gmodule.h>
 #include <gio/gio.h>
 #include <glib/gstdio.h>
 
