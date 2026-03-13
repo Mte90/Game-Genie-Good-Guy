@@ -45,7 +45,6 @@ typedef std::string _string;
 #include <unistd.h>     // linux only
 #include <dlfcn.h>      // linux only
 #include <termios.h>    // linux only
-#include <gtk/gtk.h>
 #include <glib.h>
 #include <gmodule.h>
 #include <glib/gstdio.h>
