@@ -13,7 +13,6 @@
 #include <string.h>     // dos/linux
 #include <stddef.h>     // dos/linux
 #include <stdlib.h>     // dos/linux
-#include <setjmp.h>     // dos/linux
 #include <time.h>       // dos/linux
 #include <stdarg.h>     // dos/linux
 #include <sys/types.h>
