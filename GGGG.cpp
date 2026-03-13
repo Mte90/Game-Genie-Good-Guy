@@ -275,7 +275,7 @@ char *BCX_TmpStr (size_t Bites, size_t  iPad, int iAlloc)
 
 int str_cmp (const char *a, const char *b)
 {
-    register int counter = 0;
+    int counter = 0;
     for(;;)
     {
         if((a[counter]^b[counter]))
@@ -296,7 +296,7 @@ std::string left (std::string s, int length)
 }
 char *left (const char *S, int length)
 {
-    register int tmplen = strlen(S);
+    int tmplen = strlen(S);
     if(length < 1) return BCX_TmpStr(1, 0, 1);
     if(length < tmplen) tmplen = length;
     char *strtmp = BCX_TmpStr(tmplen, 1, 1);
@@ -338,7 +338,7 @@ std::string mid (std::string s, size_t start, int length)
 char *mid (const char *S, int start, int length)
 {
     char *strtmp;
-    register int tmplen = strlen(S);
+    int tmplen = strlen(S);
     if(start > tmplen || start < 1) return BCX_TmpStr(1, 1, 1);
     if (length < 0 || length > (tmplen - start) + 1)
         length = (tmplen - start) + 1;
@@ -357,7 +357,7 @@ char *trim (const char *S)
 {
     if(S[0] == 0) return (char*)S;
     while(*S == 32 || (*S >= 9 && *S <= 13)) S++;
-    register int i = strlen(S);
+    int i = strlen(S);
     while( i > 0 && (S[i - 1] == 32 || (S[i - 1] >= 9 && S[i - 1] <= 13))) i--;
     char *strtmp = BCX_TmpStr(i, 1, 1);
     return (char*)memcpy(strtmp, S, i);
@@ -381,8 +381,8 @@ stdstr replace(stdstr & mane, stdstr match, stdstr change, int f)
 }
 char *replace (const char *src, const char *pat, const char *rep)
 {
-    register size_t patsz, repsz, tmpsz, delta;
-    register char *strtmp, *p, *q, *r;
+    size_t patsz, repsz, tmpsz, delta;
+    char *strtmp, *p, *q, *r;
     if (!pat || !*pat)
     {
         strtmp = BCX_TmpStr(strlen(src), 1, 1);
@@ -456,7 +456,7 @@ stdstr ucase(stdstr & m, int f)
 }
 char *ucase (const char *S)
 {
-    register char *strtmp = BCX_TmpStr(strlen(S), 1, 1);
+    char *strtmp = BCX_TmpStr(strlen(S), 1, 1);
     return _strupr_(strcpy(strtmp, (char*)S));
 }
 
@@ -471,7 +471,7 @@ stdstr lcase(stdstr & m, int f)
 }
 char *lcase (const char *S)
 {
-    register char *strtmp = BCX_TmpStr(strlen(S), 1, 1);
+    char *strtmp = BCX_TmpStr(strlen(S), 1, 1);
     return _strlwr_(strcpy(strtmp, (char*)S));
 }
 
@@ -508,7 +508,7 @@ char *RemoveStr (const char *a, const char *b)
 
 char *str (double d)
 {
-    register char *strtmp = BCX_TmpStr(24, 1, 1);
+    char *strtmp = BCX_TmpStr(24, 1, 1);
     sprintf(strtmp, "%.15G", d);
     return strtmp;
 }
@@ -516,7 +516,7 @@ char *str (double d)
 
 char *hex (int a)
 {
-    register char *strtmp = BCX_TmpStr(16, 1, 1);
+    char *strtmp = BCX_TmpStr(16, 1, 1);
     sprintf(strtmp, "%X", a);
     return strtmp;
 }
@@ -524,7 +524,7 @@ char *hex (int a)
 
 char *chr (int a)
 {
-    register char *strtmp = BCX_TmpStr(2, 1, 1);
+    char *strtmp = BCX_TmpStr(2, 1, 1);
     strtmp[0]  = a;
     return strtmp;
 }
@@ -532,9 +532,9 @@ char *chr (int a)
 
 char * join(int n, ...)
 {
-    register int i = n, tmplen = 0;
-    register char *s_;
-    register char *strtmp;
+    int i = n, tmplen = 0;
+    char *s_;
+    char *strtmp;
     va_list marker;
     va_start(marker, n); // Initialize variable arguments
     while(i-- > 0)
@@ -601,7 +601,7 @@ int instr(std::string mane, std::string match, int offset, int sensflag)
 }
 int instr(const char* mane, const char* match, int offset, int sensflag)
 {
-    register char *s;
+    char *s;
     if (!mane || !match || ! *match || offset > (int)strlen(mane)) return 0;
     if (sensflag)
         s = _stristr_(offset > 0 ? (char*)mane + offset - 1 : (char*)mane, (char*)match);
@@ -709,7 +709,7 @@ int Split (char Buf[][cSizeOfDefaultString], const char *T, const char *Delim, i
 
 int Bin2Dec (const char *cptr)
 {
-    register int i, j = 0;
+    int i, j = 0;
     while(cptr && *cptr && strchr("01", *cptr))
     {
         i = *cptr++ - '0';
