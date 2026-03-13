@@ -27,6 +27,7 @@
 #include <termios.h>    // linux only
 #include <glib.h>
 #include <gmodule.h>
+#include <gio/gio.h>
 #include <glib/gstdio.h>
 
 typedef char *PCHAR, *LPCH, *PCH, *NPSTR, *LPSTR, *PSTR;
