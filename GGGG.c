@@ -23,7 +23,6 @@
 #include <dirent.h>     // linux only
 #include <sys/wait.h>   // linux only
 #include <unistd.h>     // linux only
-#include <dlfcn.h>      // linux only
 #include <termios.h>    // linux only
 #include <glib.h>
 #include <gmodule.h>
