@@ -9,7 +9,6 @@
 #include <wchar.h>      // dos/linux 
 #include <ctype.h>      // dos/linux
 #include <fcntl.h>      // dos/linux
-#include <math.h>       // dos/linux
 #include <stdio.h>      // dos/linux
 #include <string.h>     // dos/linux
 #include <stddef.h>     // dos/linux
