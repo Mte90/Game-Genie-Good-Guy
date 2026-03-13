@@ -99,7 +99,6 @@ int     iMatch (const char*, const char*, int);
 #define iMatchLft(A,B) iMatch(A,B, 0)
 #define iMatchWrd(A,B) iMatch(A,B, 1)
 #define iMatchRgt(A,B) iMatch(A,B, 2)
-int     str_cmp(const char*, const char*);
 char* BCX_TmpStr(size_t, size_t , int );
 char*   lcase (const char*);
 char*   ucase (const char*);
@@ -228,23 +227,6 @@ char *BCX_TmpStr (size_t Bites, size_t  iPad, int iAlloc)
 #endif
     if(iAlloc) StrFunc[StrCnt] = (char*)calloc(Bites + iPad + 1, sizeof(char));
     return StrFunc[StrCnt];
-}
-
-
-int str_cmp (const char *a, const char *b)
-{
-    int counter = 0;
-    for(;;)
-    {
-        if((a[counter]^b[counter]))
-        {
-            if((UINT) a[counter] >= (UINT) b[counter])
-                return  1;
-            return -1;
-        }
-        if(!a[counter]) return 0;
-        counter++;
-    }
 }
 
 
@@ -704,7 +686,7 @@ int main(int argc, char *argv[])
             *Dec = 0;
             if(instr(Code, ":",  0,  0))
             {
-                if(str_cmp(Bit, "pce") == 0 || ( str_cmp(Bit, "sms") == 0 && lof(File1) % 1024))
+                if(strcmp(Bit, "pce") == 0 || ( strcmp(Bit, "sms") == 0 && lof(File1) % 1024))
                 {
                     Off +=   512;
                 }
@@ -718,7 +700,7 @@ int main(int argc, char *argv[])
                     printf("%s\n", Out);
                 }
             }
-            if(str_cmp(Type, "1") == 0)
+            if(strcmp(Type, "1") == 0)
             {
                 if(strlen(Code) == 6 )
                 {
@@ -763,135 +745,135 @@ int main(int argc, char *argv[])
 
                 }
             }
-            if(str_cmp(Type, "2") == 0)
+            if(strcmp(Type, "2") == 0)
             {
                 for(Num = 0; Num <= strlen(Code); Num += 1)
                 {
-                    if(str_cmp(mid(Code, Num, 1), "A") == 0)
+                    if(strcmp(mid(Code, Num, 1), "A") == 0)
                     {
                         strcat(Dec, "00000");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "B") == 0)
+                    if(strcmp(mid(Code, Num, 1), "B") == 0)
                     {
                         strcat(Dec, "00001");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "C") == 0)
+                    if(strcmp(mid(Code, Num, 1), "C") == 0)
                     {
                         strcat(Dec, "00010");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "D") == 0)
+                    if(strcmp(mid(Code, Num, 1), "D") == 0)
                     {
                         strcat(Dec, "00011");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "E") == 0)
+                    if(strcmp(mid(Code, Num, 1), "E") == 0)
                     {
                         strcat(Dec, "00100");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "F") == 0)
+                    if(strcmp(mid(Code, Num, 1), "F") == 0)
                     {
                         strcat(Dec, "00101");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "G") == 0)
+                    if(strcmp(mid(Code, Num, 1), "G") == 0)
                     {
                         strcat(Dec, "00110");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "H") == 0)
+                    if(strcmp(mid(Code, Num, 1), "H") == 0)
                     {
                         strcat(Dec, "00111");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "J") == 0)
+                    if(strcmp(mid(Code, Num, 1), "J") == 0)
                     {
                         strcat(Dec, "01000");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "K") == 0)
+                    if(strcmp(mid(Code, Num, 1), "K") == 0)
                     {
                         strcat(Dec, "01001");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "L") == 0)
+                    if(strcmp(mid(Code, Num, 1), "L") == 0)
                     {
                         strcat(Dec, "01010");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "M") == 0)
+                    if(strcmp(mid(Code, Num, 1), "M") == 0)
                     {
                         strcat(Dec, "01011");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "N") == 0)
+                    if(strcmp(mid(Code, Num, 1), "N") == 0)
                     {
                         strcat(Dec, "01100");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "P") == 0)
+                    if(strcmp(mid(Code, Num, 1), "P") == 0)
                     {
                         strcat(Dec, "01101");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "R") == 0)
+                    if(strcmp(mid(Code, Num, 1), "R") == 0)
                     {
                         strcat(Dec, "01110");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "S") == 0)
+                    if(strcmp(mid(Code, Num, 1), "S") == 0)
                     {
                         strcat(Dec, "01111");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "T") == 0)
+                    if(strcmp(mid(Code, Num, 1), "T") == 0)
                     {
                         strcat(Dec, "10000");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "V") == 0)
+                    if(strcmp(mid(Code, Num, 1), "V") == 0)
                     {
                         strcat(Dec, "10001");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "W") == 0)
+                    if(strcmp(mid(Code, Num, 1), "W") == 0)
                     {
                         strcat(Dec, "10010");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "X") == 0)
+                    if(strcmp(mid(Code, Num, 1), "X") == 0)
                     {
                         strcat(Dec, "10011");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "Y") == 0)
+                    if(strcmp(mid(Code, Num, 1), "Y") == 0)
                     {
                         strcat(Dec, "10100");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "Z") == 0)
+                    if(strcmp(mid(Code, Num, 1), "Z") == 0)
                     {
                         strcat(Dec, "10101");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "0") == 0)
+                    if(strcmp(mid(Code, Num, 1), "0") == 0)
                     {
                         strcat(Dec, "10110");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "1") == 0)
+                    if(strcmp(mid(Code, Num, 1), "1") == 0)
                     {
                         strcat(Dec, "10111");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "2") == 0)
+                    if(strcmp(mid(Code, Num, 1), "2") == 0)
                     {
                         strcat(Dec, "11000");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "3") == 0)
+                    if(strcmp(mid(Code, Num, 1), "3") == 0)
                     {
                         strcat(Dec, "11001");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "4") == 0)
+                    if(strcmp(mid(Code, Num, 1), "4") == 0)
                     {
                         strcat(Dec, "11010");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "5") == 0)
+                    if(strcmp(mid(Code, Num, 1), "5") == 0)
                     {
                         strcat(Dec, "11011");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "6") == 0)
+                    if(strcmp(mid(Code, Num, 1), "6") == 0)
                     {
                         strcat(Dec, "11100");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "7") == 0)
+                    if(strcmp(mid(Code, Num, 1), "7") == 0)
                     {
                         strcat(Dec, "11101");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "8") == 0)
+                    if(strcmp(mid(Code, Num, 1), "8") == 0)
                     {
                         strcat(Dec, "11110");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "9") == 0)
+                    if(strcmp(mid(Code, Num, 1), "9") == 0)
                     {
                         strcat(Dec, "11111");
                     }
@@ -911,71 +893,71 @@ int main(int argc, char *argv[])
                     strcpy(Out, join(8, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), trim(hex(Rep)), CRLF, Out));
                 }
             }
-            if(str_cmp(Type, "3") == 0)
+            if(strcmp(Type, "3") == 0)
             {
                 for(Num = 0; Num <= strlen(Code); Num += 1)
                 {
-                    if(str_cmp(mid(Code, Num, 1), "A") == 0)
+                    if(strcmp(mid(Code, Num, 1), "A") == 0)
                     {
                         strcat(Dec, "0000");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "P") == 0)
+                    if(strcmp(mid(Code, Num, 1), "P") == 0)
                     {
                         strcat(Dec, "0001");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "Z") == 0)
+                    if(strcmp(mid(Code, Num, 1), "Z") == 0)
                     {
                         strcat(Dec, "0010");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "L") == 0)
+                    if(strcmp(mid(Code, Num, 1), "L") == 0)
                     {
                         strcat(Dec, "0011");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "G") == 0)
+                    if(strcmp(mid(Code, Num, 1), "G") == 0)
                     {
                         strcat(Dec, "0100");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "I") == 0)
+                    if(strcmp(mid(Code, Num, 1), "I") == 0)
                     {
                         strcat(Dec, "0101");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "T") == 0)
+                    if(strcmp(mid(Code, Num, 1), "T") == 0)
                     {
                         strcat(Dec, "0110");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "Y") == 0)
+                    if(strcmp(mid(Code, Num, 1), "Y") == 0)
                     {
                         strcat(Dec, "0111");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "E") == 0)
+                    if(strcmp(mid(Code, Num, 1), "E") == 0)
                     {
                         strcat(Dec, "1000");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "O") == 0)
+                    if(strcmp(mid(Code, Num, 1), "O") == 0)
                     {
                         strcat(Dec, "1001");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "X") == 0)
+                    if(strcmp(mid(Code, Num, 1), "X") == 0)
                     {
                         strcat(Dec, "1010");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "U") == 0)
+                    if(strcmp(mid(Code, Num, 1), "U") == 0)
                     {
                         strcat(Dec, "1011");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "K") == 0)
+                    if(strcmp(mid(Code, Num, 1), "K") == 0)
                     {
                         strcat(Dec, "1100");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "S") == 0)
+                    if(strcmp(mid(Code, Num, 1), "S") == 0)
                     {
                         strcat(Dec, "1101");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "V") == 0)
+                    if(strcmp(mid(Code, Num, 1), "V") == 0)
                     {
                         strcat(Dec, "1110");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "N") == 0)
+                    if(strcmp(mid(Code, Num, 1), "N") == 0)
                     {
                         strcat(Dec, "1111");
                     }
@@ -1041,71 +1023,71 @@ int main(int argc, char *argv[])
 
                 }
             }
-            if(str_cmp(Type, "4") == 0)
+            if(strcmp(Type, "4") == 0)
             {
                 for(Num = 0; Num <= strlen(Code); Num += 1)
                 {
-                    if(str_cmp(mid(Code, Num, 1), "D") == 0)
+                    if(strcmp(mid(Code, Num, 1), "D") == 0)
                     {
                         strcat(Dec, "0");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "F") == 0)
+                    if(strcmp(mid(Code, Num, 1), "F") == 0)
                     {
                         strcat(Dec, "1");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "4") == 0)
+                    if(strcmp(mid(Code, Num, 1), "4") == 0)
                     {
                         strcat(Dec, "2");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "7") == 0)
+                    if(strcmp(mid(Code, Num, 1), "7") == 0)
                     {
                         strcat(Dec, "3");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "0") == 0)
+                    if(strcmp(mid(Code, Num, 1), "0") == 0)
                     {
                         strcat(Dec, "4");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "9") == 0)
+                    if(strcmp(mid(Code, Num, 1), "9") == 0)
                     {
                         strcat(Dec, "5");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "1") == 0)
+                    if(strcmp(mid(Code, Num, 1), "1") == 0)
                     {
                         strcat(Dec, "6");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "5") == 0)
+                    if(strcmp(mid(Code, Num, 1), "5") == 0)
                     {
                         strcat(Dec, "7");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "6") == 0)
+                    if(strcmp(mid(Code, Num, 1), "6") == 0)
                     {
                         strcat(Dec, "8");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "B") == 0)
+                    if(strcmp(mid(Code, Num, 1), "B") == 0)
                     {
                         strcat(Dec, "9");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "C") == 0)
+                    if(strcmp(mid(Code, Num, 1), "C") == 0)
                     {
                         strcat(Dec, "A");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "8") == 0)
+                    if(strcmp(mid(Code, Num, 1), "8") == 0)
                     {
                         strcat(Dec, "B");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "A") == 0)
+                    if(strcmp(mid(Code, Num, 1), "A") == 0)
                     {
                         strcat(Dec, "C");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "2") == 0)
+                    if(strcmp(mid(Code, Num, 1), "2") == 0)
                     {
                         strcat(Dec, "D");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "3") == 0)
+                    if(strcmp(mid(Code, Num, 1), "3") == 0)
                     {
                         strcat(Dec, "E");
                     }
-                    if(str_cmp(mid(Code, Num, 1), "E") == 0)
+                    if(strcmp(mid(Code, Num, 1), "E") == 0)
                     {
                         strcat(Dec, "F");
                     }
