@@ -77,9 +77,7 @@ using namespace std;
 #define cfree free
 typedef unsigned long DWORD;
 typedef unsigned char UCHAR;
-char   *g_cptr_;  // dummy var for not used returns
 size_t  g_dum1_;  // dummy var for not used returns
-int g_dum_int;		// dummy int var for not used returns
 #ifdef __G_LIB_H__
 gchar g_gerr[2048];  // global for glib errors
 #endif
