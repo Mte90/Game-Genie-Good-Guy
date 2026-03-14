@@ -95,7 +95,6 @@ char*   Bin (int);
 char*   RemoveStr (const char*, const char*);
 char*   join (int, ... );
 char*   chr(int);
-int InstrRev (const char*, const char*, int , int );
 int instr(const char*, const char*, int , int );
 char    *MakeLCaseTbl(void);
 char    *_stristr_(char*, char*);
@@ -408,33 +407,6 @@ char* Bin(int number)
 }
 
 
-int InstrRev (const char *s, const char *p, int os, int sens)
-{
-    int sl, pl, ox;
-    int (*cmp)(const char *, const char *, size_t );
-
-    if (!s || !p)  return 0;
-    sl  = strlen(s);
-    pl  = strlen(p);
-    if (os > sl || sl == 0 || pl == 0 || (ox = sl - pl) < 0)
-        return 0;
-
-    if (os <= 0)
-        os = ox ;
-    else if(os >= pl)
-        os = os - pl ;
-    else
-        return 0;
-
-    cmp = (sens ? strncasecmp : strncmp);
-    do {
-        if (cmp(s + os, p, pl) == 0)
-            return os + 1;
-    } while (os--);
-    return 0;
-}
-
-
 int instr(const char* mane, const char* match, int offset, int sensflag)
 {
     char *s;
@@ -631,7 +603,15 @@ int main(int argc, char *argv[])
     strcpy(Code, replace(Code, "+", LF));
     Codes = Split( Line, Code, LF,  0);
     printf("%s%i\n", "Codes to inject: ", Codes);
-    strcpy(Bit, lcase(right(File1, strlen(File1) - InstrRev(File1, ".",  0,  0))));
+    const char* ext = strrchr(File1, '.');
+    if (ext)
+    {
+        strcpy(Bit, lcase(ext + 1));
+    }
+    else
+    {
+        Bit[0] = 0;
+    }
     printf("%s%s\n", "Rom to patch: ", File1);
     printf("%s%s\n", "Patch at: ", File2);
     if((FP2 = fopen(File2, "rb+")) == 0)
