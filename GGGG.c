@@ -9,21 +9,16 @@
 #include <wchar.h>      // dos/linux 
 #include <ctype.h>      // dos/linux
 #include <fcntl.h>      // dos/linux
-#include <math.h>       // dos/linux
 #include <stdio.h>      // dos/linux
 #include <string.h>     // dos/linux
 #include <stddef.h>     // dos/linux
 #include <stdlib.h>     // dos/linux
-#include <setjmp.h>     // dos/linux
 #include <time.h>       // dos/linux
 #include <stdarg.h>     // dos/linux
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdbool.h>    // linux only
-#include <dirent.h>     // linux only
-#include <sys/wait.h>   // linux only
 #include <unistd.h>     // linux only
-#include <termios.h>    // linux only
 #include <glib.h>
 #include <gio/gio.h>
 #include <glib/gstdio.h>
