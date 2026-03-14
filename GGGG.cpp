@@ -149,7 +149,6 @@ char*   right (const char*, int);
 char*   lpad (const char*, int, int = 32);
 stdstr replace(stdstr&, stdstr, stdstr, int = 0);
 char*   replace (const char*, const char*, const char*);
-char*   str (double);
 char*   hex (int);
 char*   Bin (int);
 stdstr   RemoveStr (stdstr, stdstr);
@@ -504,14 +503,6 @@ char *RemoveStr (const char *a, const char *b)
 }
 
 
-char *str (double d)
-{
-    char *strtmp = BCX_TmpStr(24, 1, 1);
-    sprintf(strtmp, "%.15G", d);
-    return strtmp;
-}
-
-
 char *hex (int a)
 {
     char *strtmp = BCX_TmpStr(16, 1, 1);
@@ -798,7 +789,7 @@ int main(int argc, char *argv[])
     strcpy(Code, replace(Code, "-", ""));
     strcpy(Code, replace(Code, "+", LF));
     Codes = Split( Line, Code, LF);
-    printf("%s%s\n", "Codes to inject: ", str( Codes));
+    printf("%s%i\n", "Codes to inject: ", Codes);
     strcpy(Bit, lcase(right(File1, strlen(File1) - InstrRev(File1, "."))));
     printf("%s%s\n", "Rom to patch: ", File1);
     printf("%s%s\n", "Patch at: ", File2);
