@@ -177,8 +177,6 @@ static char    CRLF[3] = {13, 10, 0}; // Carr Rtn & Line Feed
 //            User Global Variables
 // *************************************************
 
-static PCHAR   *g_argv;
-static int     g_argc;
 static int     Cmp;
 static int     Lnum;
 static int     Num;
@@ -737,8 +735,6 @@ char *_strlwr_(char *string)
 
 int main(int argc, char *argv[])
 {
-    g_argc = argc;
-    g_argv = argv;
     LowCase = (char*)calloc(257, 1);
     LowCase = MakeLCaseTbl();
     if((argc < 4))
