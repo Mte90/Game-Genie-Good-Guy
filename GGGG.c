@@ -180,7 +180,7 @@ gboolean gCopyFile (const gchar*  source, const gchar*  dest, gboolean  overwrit
     GError*  gerr = {0};
     GFile*   fsrc = {0};
     GFile*   fdest = {0};
-    int      owflag = G_FILE_COPY_OVERWRITE;
+    GFileCopyFlags owflag = G_FILE_COPY_OVERWRITE;
     if(overwrite )
     {
         owflag = G_FILE_COPY_NONE;
