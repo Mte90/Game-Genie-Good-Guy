@@ -20,11 +20,6 @@ typedef std::string::value_type charT;
 typedef std::string stdstr;
 #define _X(y) y
 using namespace std;
-#ifdef UNICODE
-typedef std::wstring _string;
-#else
-typedef std::string _string;
-#endif
 #endif
 #include <wchar.h>      // dos/linux 
 #include <ctype.h>      // dos/linux
@@ -43,8 +38,6 @@ typedef std::string _string;
 #include <gio/gio.h>
 #include <glib/gstdio.h>
 
-typedef char *PCHAR, *LPCH, *PCH, *NPSTR, *LPSTR, *PSTR;
-typedef unsigned long DWORD, ULONG, *PDWORD, *LPDWORD, *PULONG;
 #ifndef bool
 #define bool gboolean
 #endif
@@ -80,21 +73,10 @@ typedef unsigned long DWORD, ULONG, *PDWORD, *LPDWORD, *PULONG;
 //            System Defined Constants
 // *************************************************
 
-typedef const char* ccptr;
-#define CCPTR const char*
 #define NOT_USED(x) if(x);
 #define cfree free
-typedef unsigned short WORD;
-typedef WORD *LPWORD;
-typedef int BOOL;
 typedef unsigned long DWORD;
-typedef char CHAR;
-typedef int *PINT;
-typedef unsigned int UINT;
-typedef void *LPVOID;
-typedef unsigned char byte;
-typedef unsigned char BYTE;
-typedef unsigned char UCHAR, *PUCHAR;
+typedef unsigned char UCHAR;
 char   *g_cptr_;  // dummy var for not used returns
 size_t  g_dum1_;  // dummy var for not used returns
 int g_dum_int;		// dummy int var for not used returns
