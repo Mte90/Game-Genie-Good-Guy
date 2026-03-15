@@ -526,7 +526,7 @@ char *_strlwr_(char *string)
 
 int main(int argc, char *argv[])
 {
-    if((argc < 4))
+    if(argc != 5)
     {
         printf("%s\n", "ERROR: Missing some parameters, check the readme");
         exit(1);
