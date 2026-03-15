@@ -661,7 +661,7 @@ int main(int argc, char *argv[])
             }
             if(strcmp(Type, "2") == 0)
             {
-                for(Num = 0; Num < strlen(Code); Num += 1)
+                for(Num = 0; Code[Num]; Num += 1)
                 {
                     switch (Code[Num])
                     {
@@ -783,7 +783,7 @@ int main(int argc, char *argv[])
             }
             if(strcmp(Type, "3") == 0)
             {
-                for(Num = 0; Num < strlen(Code); Num += 1)
+                for(Num = 0; Code[Num]; Num += 1)
                 {
                     switch (Code[Num])
                     {
@@ -903,7 +903,7 @@ int main(int argc, char *argv[])
             }
             if(strcmp(Type, "4") == 0)
             {
-                for(Num = 0; Num < strlen(Code); Num += 1)
+                for(Num = 0; Code[Num]; Num += 1)
                 {
                     switch (Code[Num])
                     {
