@@ -638,10 +638,7 @@ int main(int argc, char *argv[])
     strcpy(Type, argv[2]);
     strcpy(File1, argv[3]);
     strcpy(File2, argv[4]);
-    if(Exist(File2))
-    {
-        remove (File2 );
-    }
+    remove(File2);
     if(Exist(File1))
     {
         gCopyFile (File1, File2,true);
