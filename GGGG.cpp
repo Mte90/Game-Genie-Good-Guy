@@ -129,10 +129,7 @@ stdstr   RemoveStr (stdstr, stdstr);
 char*   RemoveStr (const char*, const char*);
 char*   join (int, ... );
 char*   chr(int);
-int     instr(const char*, const char*, int = 0, int = 0);
-int     instr(std::string, std::string, int = 0, int = 0);
 char    *MakeLCaseTbl(void);
-char    *_stristr_(char*, char*);
 char    *_strstr_(char*, char*);
 int     Bin2Dec (const char*);
 int     Hex2Dec (const char*);
@@ -507,26 +504,6 @@ char* Bin(int number)
 }
 
 
-int instr(std::string mane, std::string match, int offset, int sensflag)
-{
-    char* m1;
-    char* m2;
-    m1 = (char*)mane.c_str();
-    m2 = (char*)match.c_str();
-    return instr(m1, m2, offset, sensflag);
-}
-int instr(const char* mane, const char* match, int offset, int sensflag)
-{
-    char *s;
-    if (!mane || !match || ! *match || offset > (int)strlen(mane)) return 0;
-    if (sensflag)
-        s = _stristr_(offset > 0 ? (char*)mane + offset - 1 : (char*)mane, (char*)match);
-    else
-        s = _strstr_(offset > 0 ? (char*)mane + offset - 1 : (char*)mane, (char*)match);
-    return s ? (int)(s - mane) + 1 : 0;
-}
-
-
 char  *MakeLCaseTbl (void)
 {
     static char tbl[257];
@@ -541,22 +518,6 @@ char  *MakeLCaseTbl (void)
     strcpy(tbl, s.c_str());
     tbl[0] = 0;
     return tbl;
-}
-
-
-char *_stristr_(char *String, char *Pattern)
-{
-    int   mi = -1;
-    while(Pattern[++mi])
-    {
-        if(String[mi] == 0) return 0;
-        if(LowCase[(unsigned char)String[mi]] != LowCase[(unsigned char)Pattern[mi]])
-        {
-            String++;
-            mi = -1;
-        }
-    }
-    return String;
 }
 
 
@@ -599,7 +560,7 @@ int Split (char Buf[][cSizeOfDefaultString], const char *T, const char *Delim, i
     char Chr34[2] = {34, 0};
     for(Index = 1; Index <= lenT; Index++)
     {
-        if(instr(Delim, mid(T, Index, 1), 0, 0) && !Quote)
+        if(T[Index] && strchr(Delim, T[Index]) && !Quote)
         {
             strcpy(Buf[Count], (char*)mid(T, Begin, Index - Begin));
             if ((Flg & 2) == 0)  // 0 if old version
@@ -740,7 +701,7 @@ int main(int argc, char *argv[])
             strcpy(Code, Line[Lnum]);
             printf("%s%s\n", "Parsing code: ", Code);
             *Dec = 0;
-            if(instr(Code, ":"))
+            if(strchr(Code, ':'))
             {
                 if(strcmp(Bit, "pce") == 0 || ( strcmp(Bit, "sms") == 0 && lof(File1) % 1024))
                 {

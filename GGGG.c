@@ -95,9 +95,7 @@ char*   Bin (int);
 char*   RemoveStr (const char*, const char*);
 char*   join (int, ... );
 char*   chr(int);
-int instr(const char*, const char*, int , int );
 char    *MakeLCaseTbl(void);
-char    *_stristr_(char*, char*);
 char    *_strstr_(char*, char*);
 int     Bin2Dec (const char*);
 int     Hex2Dec (const char*);
@@ -407,18 +405,6 @@ char* Bin(int number)
 }
 
 
-int instr(const char* mane, const char* match, int offset, int sensflag)
-{
-    char *s;
-    if (!mane || !match || ! *match || offset > (int)strlen(mane)) return 0;
-    if (sensflag)
-        s = _stristr_(offset > 0 ? (char*)mane + offset - 1 : (char*)mane, (char*)match);
-    else
-        s = _strstr_(offset > 0 ? (char*)mane + offset - 1 : (char*)mane, (char*)match);
-    return s ? (int)(s - mane) + 1 : 0;
-}
-
-
 char  *MakeLCaseTbl (void)
 {
     static char tbl[256];
@@ -429,22 +415,6 @@ char  *MakeLCaseTbl (void)
             tbl[i] = (char)(int)tolower(i);
     }
     return tbl;
-}
-
-
-char *_stristr_(char *String, char *Pattern)
-{
-    int   mi = -1;
-    while(Pattern[++mi])
-    {
-        if(String[mi] == 0) return 0;
-        if(LowCase[(unsigned char)String[mi]] != LowCase[(unsigned char)Pattern[mi]])
-        {
-            String++;
-            mi = -1;
-        }
-    }
-    return String;
 }
 
 
@@ -487,7 +457,7 @@ int Split (char Buf[][cSizeOfDefaultString], const char *T, const char *Delim, i
     char Chr34[2] = {34, 0};
     for(Index = 1; Index <= lenT; Index++)
     {
-        if(instr(Delim, mid(T, Index, 1), 0, 0) && !Quote)
+        if(T[Index] && strchr(Delim, T[Index]) && !Quote)
         {
             strcpy(Buf[Count], (char*)mid(T, Begin, Index - Begin));
             if ((Flg & 2) == 0)  // 0 if old version
@@ -628,7 +598,7 @@ int main(int argc, char *argv[])
             strcpy(Code, Line[Lnum]);
             printf("%s%s\n", "Parsing code: ", Code);
             *Dec = 0;
-            if(instr(Code, ":",  0,  0))
+            if(strchr(Code, ':'))
             {
                 if(strcmp(Bit, "pce") == 0 || ( strcmp(Bit, "sms") == 0 && lof(File1) % 1024))
                 {
