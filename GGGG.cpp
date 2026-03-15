@@ -92,7 +92,7 @@ gchar g_gerr[2048];  // global for glib errors
 //               Standard Prototypes
 // *************************************************
 
-gboolean gCopyFile (const gchar*, const gchar*, gboolean = 0 );
+bool    gCopyFile (const gchar*, const gchar*, gboolean = 0 );
 int     iMatch (const char*, const char*, int);
 #define iMatchLft(A,B) iMatch(A,B, 0)
 #define iMatchWrd(A,B) iMatch(A,B, 1)
@@ -132,7 +132,6 @@ char*   chr(int);
 char    *_strstr_(char*, char*);
 int     Bin2Dec (const char*);
 int     Hex2Dec (const char*);
-gboolean Exist(const char*);
 DWORD   lof (const char*);
 int     Split (char [][cSizeOfDefaultString], const char*, const char*, int = 0);
 static char    LF  [2] = {10, 0}; // Line Feed
@@ -182,7 +181,7 @@ static char    Out[cSizeOfDefaultString];
 //                 Runtime Functions
 // *************************************************
 
-gboolean gCopyFile (const gchar*  source, const gchar*  dest, gboolean  overwrite)
+bool gCopyFile (const gchar*  source, const gchar*  dest, gboolean  overwrite)
 {
     GError*  gerr = {0};
     GFile*   fsrc = {0};
@@ -203,10 +202,10 @@ gboolean gCopyFile (const gchar*  source, const gchar*  dest, gboolean  overwrit
     fdest = g_file_new_for_path( dest);
     if(g_file_copy(fsrc, fdest, owflag, NULL, NULL, NULL, &gerr))
     {
-        return 1;
+        return true;
     }
     strcpy(g_gerr, gerr->message);
-    return 0;
+    return false;
 }
 #ifndef BCXTmpStrSize
 #define BCXTmpStrSize  2048
@@ -514,10 +513,6 @@ char *_strstr_(char *String, char *Pattern)
 }
 
 
-gboolean Exist (const char*  sfn)
-{
-    return g_file_test(sfn, (GFileTest)(G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR));
-}
 DWORD lof (const char * FileName)
 {
     int retstat;
@@ -636,11 +631,7 @@ int main(int argc, char *argv[])
     const char* File1 = argv[3];
     const char* File2 = argv[4];
     remove(File2);
-    if(Exist(File1))
-    {
-        gCopyFile (File1, File2,true);
-    }
-    else
+    if(!gCopyFile (File1, File2,true))
     {
         printf("%s\n", "ERROR: ROM doesn't exists");
         exit(1);
