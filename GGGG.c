@@ -31,14 +31,6 @@
 // ***************************************************
 // Compiler Defines
 // ***************************************************
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
 #ifndef MAX_PATH
 #define MAX_PATH 2048
 #endif
@@ -72,10 +64,6 @@ size_t  g_dum1_;  // dummy var for not used returns
 // *************************************************
 
 bool    gCopyFile (const gchar*, const gchar*, gboolean );
-int     iMatch (const char*, const char*, int);
-#define iMatchLft(A,B) iMatch(A,B, 0)
-#define iMatchWrd(A,B) iMatch(A,B, 1)
-#define iMatchRgt(A,B) iMatch(A,B, 2)
 char* BCX_TmpStr(size_t, size_t , int );
 char*   lcase (const char*);
 char*   ucase (const char*);
@@ -154,7 +142,7 @@ bool gCopyFile (const gchar*  source, const gchar*  dest, gboolean  overwrite)
     {
         owflag = G_FILE_COPY_NONE;
     }
-    if(iMatchLft(source, "http:") || iMatchLft(source, "https:"))
+    if(strncmp(source, "http:", 5) == 0 || strncmp(source, "https:", 6) == 0)
     {
         fsrc = g_file_new_for_uri( source);
     }
@@ -278,39 +266,6 @@ char *replace (const char *src, const char *pat, const char *rep)
 }
 
 
-int iMatch (const char*  Arg, const char*  MatchStr, int mt)
-{
-    if(mt == 2 )
-    {
-        int     L1;
-        int     L2;
-        L1 = strlen( Arg);
-        L2 = strlen( MatchStr);
-        if(L1 < L2 )
-        {
-            return FALSE;
-        }
-        Arg = ( Arg + L1) - L2;
-    }
-    while(*MatchStr)
-    {
-        if(*Arg == 0 )
-        {
-            return FALSE;
-        }
-        if((*Arg | 32) != (*MatchStr | 32))
-        {
-            return FALSE;
-        }
-        Arg++;
-        MatchStr++;
-    }
-    if(mt && *Arg != 0 )
-    {
-        return FALSE;
-    }
-    return TRUE;
-}
 char *ucase (const char *S)
 {
     char *strtmp = BCX_TmpStr(strlen(S), 1, 1);
