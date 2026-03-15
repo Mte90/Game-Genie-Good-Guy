@@ -98,15 +98,13 @@ stdstr replace(stdstr&, stdstr, stdstr, int = 0);
 char*   replace (const char*, const char*, const char*);
 char*   hex (int);
 char*   Bin (int);
-stdstr   RemoveStr (stdstr, stdstr);
-char*   RemoveStr (const char*, const char*);
 char*   join (int, ... );
 char*   chr(int);
 char    *_strstr_(char*, char*);
 int     Bin2Dec (const char*);
 int     Hex2Dec (const char*);
 off_t   lof (const char*);
-int     Split (char [][cSizeOfDefaultString], const char*, const char*, int = 0);
+int     Split (char [][cSizeOfDefaultString], char*, const char*);
 static char    LF  [2] = {10, 0}; // Line Feed
 static char    CRLF[3] = {13, 10, 0}; // Carr Rtn & Line Feed
 
@@ -357,36 +355,6 @@ char *lcase (const char *S)
 }
 
 
-stdstr RemoveStr(stdstr a, stdstr b)
-{
-    char *c, *d, *rv;
-    stdstr s;
-    c = (char*)a.c_str();
-    d = (char*)b.c_str();
-    rv = RemoveStr(c, d);
-    s = rv;
-    return s;
-}
-char *RemoveStr (const char *a, const char *b)
-{
-    char *strtmp, *p, *d;
-    int  tmplen;
-    strtmp = d = BCX_TmpStr(strlen(a), 1, 1);
-    if(!b || !*b) return strcpy(strtmp, a);
-    p = _strstr_((char*)a, (char*)b);
-    tmplen = strlen(b);
-    while(p)
-    {
-        memcpy(d, a, p - a);
-        d += (p - a);
-        a = p + tmplen;
-        p = _strstr_((char*)a, (char*)b);
-    }
-    strcpy(d, a);
-    return strtmp;
-}
-
-
 char *hex (int a)
 {
     char *strtmp = BCX_TmpStr(16, 1, 1);
@@ -462,37 +430,16 @@ off_t lof (const char * FileName)
         return sb.st_size;
     return 0;
 }
-int Split (char Buf[][cSizeOfDefaultString], const char *T, const char *Delim, int Flg)
+int Split (char Buf[][cSizeOfDefaultString], char *T, const char *Delim)
 {
-    int  Begin = 0;
-    int  Count = 0;
-    int  Quote = 0;
-    int  Index, i;
-    int  lenT  = strlen(T);
-    char Chr34[2] = {34, 0};
-    for(Index = 1; Index <= lenT; Index++)
+    int count = 0;
+    char *token;
+    token = strtok(T, Delim);
+    do
     {
-        if(T[Index] && strchr(Delim, T[Index]) && !Quote)
-        {
-            strcpy(Buf[Count], (char*)mid(T, Begin, Index - Begin));
-            if ((Flg & 2) == 0)  // 0 if old version
-                Count++;
-            else if (Buf[Count][0] != 0) Count++;
-            Begin = 0;
-            if((Flg & 1) == 1)   // 1 if true
-                strcpy(Buf[Count++], (char*)mid(T, Index, 1));
-        }
-        else
-        {
-            if(strcmp(mid(T, Index, 1), Chr34) == 0) Quote = !Quote;
-            if(Begin == 0) Begin = Index;
-        }
-    }
-    if(Begin)
-        strcpy(Buf[Count++], (char*)mid(T, Begin, Index - Begin));
-    if((Flg & 1) == 0)   // 0 if false
-        for(i = 0; i < Count; i++) strcpy(Buf[i], (char*)RemoveStr(Buf[i], Chr34));
-    return Count;
+        strcpy(Buf[count++], token);
+    } while((token = strtok(NULL, Delim)) != NULL);
+    return count;
 }
 
 
