@@ -413,16 +413,9 @@ int Bin2Dec (const char *cptr)
 
 int Hex2Dec (const char *szInput)
 {
-    char   ch;
-    char  *dwLen   = (char*)szInput + strlen(szInput);
-    DWORD  dwOut   = 0;
-    while(*szInput)
-    {
-        ch = tolower(*szInput++);
-        if((ch >= 'a' && ch <= 'f')  || (ch >= '0' && ch <= '9'))
-            dwOut |= ((int)ch - (ch > '9' ? 'a' - 10 : '0')) << ((dwLen - szInput) << 2);
-    }
-    return dwOut;
+    int ret = 0;
+    sscanf(szInput, "%x", &ret);
+    return ret;
 }
 
 
