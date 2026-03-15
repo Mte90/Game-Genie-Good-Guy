@@ -160,12 +160,8 @@ static int     Codes;
 static FILE   *FP2;
 static char    Line[200][cSizeOfDefaultString];
 static char    Bit[cSizeOfDefaultString];
-static char    Code[cSizeOfDefaultString];
 static char    Dec[cSizeOfDefaultString];
-static char    File1[cSizeOfDefaultString];
-static char    File2[cSizeOfDefaultString];
 static char    Out[cSizeOfDefaultString];
-static char    Type[cSizeOfDefaultString];
 
 
 // *************************************************
@@ -634,10 +630,11 @@ int main(int argc, char *argv[])
         printf("%s\n", "ERROR: Missing some parameters, check the readme");
         exit(1);
     }
+    static char Code[cSizeOfDefaultString];
     strcpy(Code, argv[1]);
-    strcpy(Type, argv[2]);
-    strcpy(File1, argv[3]);
-    strcpy(File2, argv[4]);
+    const char* Type = argv[2];
+    const char* File1 = argv[3];
+    const char* File2 = argv[4];
     remove(File2);
     if(Exist(File1))
     {
