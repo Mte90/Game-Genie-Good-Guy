@@ -60,9 +60,6 @@
 typedef unsigned long DWORD;
 typedef unsigned char UCHAR;
 size_t  g_dum1_;  // dummy var for not used returns
-#ifdef __G_LIB_H__
-gchar g_gerr[2048];  // global for glib errors
-#endif
 #define cSizeOfDefaultString 2048
 
 // *************************************************
@@ -170,7 +167,7 @@ bool gCopyFile (const gchar*  source, const gchar*  dest, gboolean  overwrite)
     {
         return true;
     }
-    strcpy(g_gerr, gerr->message);
+    fprintf(stderr, "%s\n", gerr->message);
     return false;
 }
 #ifndef BCXTmpStrSize
