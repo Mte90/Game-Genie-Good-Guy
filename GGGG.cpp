@@ -525,8 +525,8 @@ gboolean Exist (const char*  sfn)
 DWORD lof (const char * FileName)
 {
     int retstat;
-    GStatBuf sb;
-    retstat = g_stat(FileName, &sb);
+    struct stat sb;
+    retstat = stat(FileName, &sb);
     if(retstat != -1)
         return sb.st_size;
     return 0;
