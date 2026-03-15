@@ -95,14 +95,12 @@ char*   Bin (int);
 char*   RemoveStr (const char*, const char*);
 char*   join (int, ... );
 char*   chr(int);
-char    *MakeLCaseTbl(void);
 char    *_strstr_(char*, char*);
 int     Bin2Dec (const char*);
 int     Hex2Dec (const char*);
 gboolean Exist(const char*);
 DWORD   lof (const char*);
 int Split (char [][cSizeOfDefaultString], const char*, const char*, int );
-char *LowCase;
 static char    LF  [2] = {10, 0}; // Line Feed
 static char    CRLF[3] = {13, 10, 0}; // Carr Rtn & Line Feed
 
@@ -405,19 +403,6 @@ char* Bin(int number)
 }
 
 
-char  *MakeLCaseTbl (void)
-{
-    static char tbl[256];
-    if(!tbl['a'])
-    {
-        int i;
-        for (i = 0; i < 256; i++)
-            tbl[i] = (char)(int)tolower(i);
-    }
-    return tbl;
-}
-
-
 char *_strstr_(char *String, char *Pattern)
 {
     int   mi = -1;
@@ -501,7 +486,7 @@ int Hex2Dec (const char *szInput)
     DWORD  dwOut   = 0;
     while(*szInput)
     {
-        ch = LowCase[(unsigned char) * szInput++];
+        ch = tolower(*szInput++);
         if((ch >= 'a' && ch <= 'f')  || (ch >= '0' && ch <= '9'))
             dwOut |= ((int)ch - (ch > '9' ? 'a' - 10 : '0')) << ((dwLen - szInput) << 2);
     }
@@ -545,8 +530,6 @@ char *_strlwr_(char *string)
 
 int main(int argc, char *argv[])
 {
-    LowCase = (char*)calloc(257, 1);
-    LowCase = MakeLCaseTbl();
     if((argc < 4))
     {
         printf("%s\n", "ERROR: Missing some parameters, check the readme");
