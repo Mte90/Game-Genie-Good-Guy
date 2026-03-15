@@ -23,20 +23,11 @@
 #include <gio/gio.h>
 #include <glib/gstdio.h>
 
-#ifndef bool
-#define bool gboolean
-#endif
 #define __cdecl
 #define __stdcall
 // ***************************************************
 // Compiler Defines
 // ***************************************************
-#ifndef MAX_PATH
-#define MAX_PATH 2048
-#endif
-
-
-#define stricmp strcasecmp
 #include "./include/functions.c"
 
 // *************************************************
@@ -47,8 +38,6 @@
 //            System Defined Constants
 // *************************************************
 
-#define NOT_USED(x) if(x);
-#define cfree free
 typedef unsigned long DWORD;
 typedef unsigned char UCHAR;
 size_t  g_dum1_;  // dummy var for not used returns
