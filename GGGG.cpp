@@ -539,7 +539,7 @@ int main(int argc, char *argv[])
     printf("%s%s\n", CRLF, "Log:");
     for(Lnum = 0; Lnum <= Codes; Lnum += 1)
     {
-        strcpy(Line[Num], trim(ucase(Line[Num])));
+        strcpy(Line[Lnum], trim(ucase(Line[Lnum])));
         if(Line[Lnum][0] != 0 )
         {
             strcpy(Code, Line[Lnum]);
