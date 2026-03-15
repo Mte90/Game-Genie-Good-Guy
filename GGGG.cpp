@@ -56,7 +56,6 @@ using namespace std;
 //            System Defined Constants
 // *************************************************
 
-typedef unsigned long DWORD;
 typedef unsigned char UCHAR;
 size_t  g_dum1_;  // dummy var for not used returns
 #define cSizeOfDefaultString 2048
@@ -106,7 +105,7 @@ char*   chr(int);
 char    *_strstr_(char*, char*);
 int     Bin2Dec (const char*);
 int     Hex2Dec (const char*);
-DWORD   lof (const char*);
+off_t   lof (const char*);
 int     Split (char [][cSizeOfDefaultString], const char*, const char*, int = 0);
 static char    LF  [2] = {10, 0}; // Line Feed
 static char    CRLF[3] = {13, 10, 0}; // Carr Rtn & Line Feed
@@ -454,7 +453,7 @@ char *_strstr_(char *String, char *Pattern)
 }
 
 
-DWORD lof (const char * FileName)
+off_t lof (const char * FileName)
 {
     int retstat;
     struct stat sb;
