@@ -856,43 +856,110 @@ int main(int argc, char *argv[])
         exit(1);
     }
     printf("%s%s\n", CRLF, "Log:");
-    for(Lnum = 0; Lnum <= Codes; Lnum += 1)
+    for(Lnum = 0; Lnum < Codes; Lnum += 1)
     {
         struct codebits decoded;
 
         strcpy(Line[Lnum], trim(ucase(Line[Lnum])));
-        if(Line[Lnum][0] != 0 )
+        strcpy(Code, Line[Lnum]);
+        printf("%s%s\n", "Parsing code: ", Code);
+        *Dec = 0;
+        if(strchr(Code, ':'))
         {
-            strcpy(Code, Line[Lnum]);
-            printf("%s%s\n", "Parsing code: ", Code);
-            *Dec = 0;
-            if(strchr(Code, ':'))
+            if(strcmp(Bit, "pce") == 0 || ( strcmp(Bit, "sms") == 0 && lof(File1) % 1024))
             {
-                if(strcmp(Bit, "pce") == 0 || ( strcmp(Bit, "sms") == 0 && lof(File1) % 1024))
-                {
-                    Off +=   512;
-                }
-                Off = Hex2Dec(left( Code, strlen( Code) - 3));
-                Rep = Hex2Dec(right( Code, 2));
-                if(Off < lof(File1))
-                {
-                    fseek(FP2, Off, 0);
-                    PUT(FP2, chr(Rep), 1 );
-                    strcpy(Out, join(3, Line[Lnum], CRLF, Out));
-                    printf("%s\n", Out);
-                }
+                Off +=   512;
             }
-            if(strcmp(Type, "1") == 0)
+            Off = Hex2Dec(left( Code, strlen( Code) - 3));
+            Rep = Hex2Dec(right( Code, 2));
+            if(Off < lof(File1))
             {
-                if (!decodeGbGgMs(Code, &decoded))
-                {
-                    continue;
-                }
-                Off = decoded.off;
-                Cmp = decoded.cmp;
-                Rep = decoded.rep;
+                fseek(FP2, Off, 0);
+                PUT(FP2, chr(Rep), 1 );
+                strcpy(Out, join(3, Line[Lnum], CRLF, Out));
+                printf("%s\n", Out);
+            }
+        }
+        if(strcmp(Type, "1") == 0)
+        {
+            if (!decodeGbGgMs(Code, &decoded))
+            {
+                continue;
+            }
+            Off = decoded.off;
+            Cmp = decoded.cmp;
+            Rep = decoded.rep;
 
-                if(decoded.len == 6)
+            if(decoded.len == 6)
+            {
+                for(Num = 0; Num <= lof(File1) / 8192; Num += 1)
+                {
+                    if(Off < lof(File1))
+                    {
+                        fseek(FP2, Off, 0);
+                        PUT(FP2, chr(Rep), 1 );
+                        strcpy(Out, join(9, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), ":", trim(hex(Rep)), CRLF, Out));
+                    }
+                    Off +=   8192;
+                }
+
+            }
+            if(decoded.len == 9)
+            {
+                for(Num = 0; Num <= lof(File1) / 8192; Num += 1)
+                {
+                    if(Off < lof(File1))
+                    {
+                        fseek(FP2, Off, 0);
+                        GET(FP2, Code, 1 );
+                        if((UCHAR) * (Code) == Cmp )
+                        {
+                            fseek(FP2, Off, 0);
+                            PUT(FP2, chr(Rep), 1 );
+                            strcpy(Out, join(9, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), ":", trim(hex(Rep)), CRLF, Out));
+                        }
+                    }
+                    Off +=   8192;
+                }
+
+            }
+        }
+        if(strcmp(Type, "2") == 0)
+        {
+            if (!decodeGenesis(Code, &decoded))
+            {
+                continue;
+            }
+            Off = decoded.off;
+            Cmp = decoded.cmp;
+            Rep = decoded.rep;
+
+            if(Off < lof(File1))
+            {
+                fseek(FP2, Off, 0);
+                PUT(FP2, chr(Cmp), 1 );
+                fseek(FP2, Off + 1, 0);
+                PUT(FP2, chr(Rep), 1 );
+                strcpy(Out, join(8, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), trim(hex(Rep)), CRLF, Out));
+            }
+        }
+        if(strcmp(Type, "3") == 0)
+        {
+            if (!decodeNES(Code, &decoded))
+            {
+                continue;
+            }
+            Off = decoded.off;
+            Cmp = decoded.cmp;
+            Rep = decoded.rep;
+
+            if(decoded.len == 6)
+            {
+                if(lof(File1) % 1024 != 0 )
+                {
+                    Off +=   16;
+                }
+                if(lof(File1) >= 49169 )
                 {
                     for(Num = 0; Num <= lof(File1) / 8192; Num += 1)
                     {
@@ -906,150 +973,80 @@ int main(int argc, char *argv[])
                     }
 
                 }
-                if(decoded.len == 9)
-                {
-                    for(Num = 0; Num <= lof(File1) / 8192; Num += 1)
-                    {
-                        if(Off < lof(File1))
-                        {
-                            fseek(FP2, Off, 0);
-                            GET(FP2, Code, 1 );
-                            if((UCHAR) * (Code) == Cmp )
-                            {
-                                fseek(FP2, Off, 0);
-                                PUT(FP2, chr(Rep), 1 );
-                                strcpy(Out, join(9, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), ":", trim(hex(Rep)), CRLF, Out));
-                            }
-                        }
-                        Off +=   8192;
-                    }
-
-                }
-            }
-            if(strcmp(Type, "2") == 0)
-            {
-                if (!decodeGenesis(Code, &decoded))
-                {
-                    continue;
-                }
-                Off = decoded.off;
-                Cmp = decoded.cmp;
-                Rep = decoded.rep;
-
-                if(Off < lof(File1))
+                else
                 {
                     fseek(FP2, Off, 0);
-                    PUT(FP2, chr(Cmp), 1 );
-                    fseek(FP2, Off + 1, 0);
                     PUT(FP2, chr(Rep), 1 );
-                    strcpy(Out, join(8, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), trim(hex(Rep)), CRLF, Out));
+                    strcpy(Out, join(9, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), ":", trim(hex(Rep)), CRLF, Out));
                 }
             }
-            if(strcmp(Type, "3") == 0)
+            if(decoded.len == 8)
             {
-                if (!decodeNES(Code, &decoded))
+                if(lof(File1) % 1024 != 0 )
                 {
-                    continue;
+                    Off +=   16;
                 }
-                Off = decoded.off;
-                Cmp = decoded.cmp;
-                Rep = decoded.rep;
-
-                if(decoded.len == 6)
+                for(Num = 0; Num <= lof(File1) / 8192; Num += 1)
                 {
-                    if(lof(File1) % 1024 != 0 )
-                    {
-                        Off +=   16;
-                    }
-                    if(lof(File1) >= 49169 )
-                    {
-                        for(Num = 0; Num <= lof(File1) / 8192; Num += 1)
-                        {
-                            if(Off < lof(File1))
-                            {
-                                fseek(FP2, Off, 0);
-                                PUT(FP2, chr(Rep), 1 );
-                                strcpy(Out, join(9, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), ":", trim(hex(Rep)), CRLF, Out));
-                            }
-                            Off +=   8192;
-                        }
-
-                    }
-                    else
+                    if(Off < lof(File1))
                     {
                         fseek(FP2, Off, 0);
-                        PUT(FP2, chr(Rep), 1 );
-                        strcpy(Out, join(9, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), ":", trim(hex(Rep)), CRLF, Out));
-                    }
-                }
-                if(decoded.len == 8)
-                {
-                    if(lof(File1) % 1024 != 0 )
-                    {
-                        Off +=   16;
-                    }
-                    for(Num = 0; Num <= lof(File1) / 8192; Num += 1)
-                    {
-                        if(Off < lof(File1))
+                        GET(FP2, Code, 1 );
+                        if((UCHAR) * (Code) == Cmp )
                         {
                             fseek(FP2, Off, 0);
-                            GET(FP2, Code, 1 );
-                            if((UCHAR) * (Code) == Cmp )
-                            {
-                                fseek(FP2, Off, 0);
-                                PUT(FP2, chr(Rep), 1 );
-                                strcpy(Out, join(9, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), ":", trim(hex(Rep)), CRLF, Out));
-                            }
+                            PUT(FP2, chr(Rep), 1 );
+                            strcpy(Out, join(9, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), ":", trim(hex(Rep)), CRLF, Out));
                         }
-                        Off +=   8192;
                     }
-
+                    Off +=   8192;
                 }
+
             }
-            if(strcmp(Type, "4") == 0)
+        }
+        if(strcmp(Type, "4") == 0)
+        {
+            if (!decodeSNES(Code, &decoded))
             {
-                if (!decodeSNES(Code, &decoded))
-                {
-                    continue;
-                }
-                Off = decoded.off;
-                Cmp = decoded.cmp;
-                Rep = decoded.rep;
+                continue;
+            }
+            Off = decoded.off;
+            Cmp = decoded.cmp;
+            Rep = decoded.rep;
 
-                if(lof(File1) % 1024 != 0 )
-                {
-                    Off +=   512;
-                }
-                strcpy(Dec, hex(Off));
-                Num = 65493;
-                if(lof(File1) % 1024 != 0 )
-                {
-                    Num +=   512;
-                }
-                fseek(FP2, Num, 0);
-                GET(FP2, Bit, 1 );
-                if((UCHAR) * (Bit) != 33 && (UCHAR) * (Bit) != 49 )
-                {
-                    Off = Bin2Dec(join( 3, "0", left(lpad(Bin( Hex2Dec( Dec)), 24, 48), 8), right(lpad(Bin( Hex2Dec( Dec)), 24, 48), 15)));
-                }
-                if(Off >= 4194304 && Off <= 8388607 )
-                {
-                    Off -=   4194304;
-                }
-                if(Off >= 8388608 && Off <= 12582911 )
-                {
-                    Off -=   8388608;
-                }
-                if(Off >= 12582912 && Off <= 16777215 )
-                {
-                    Off -=   12582912;
-                }
-                if(Off < lof(File1))
-                {
-                    fseek(FP2, Off, 0);
-                    PUT(FP2, chr(Rep), 1 );
-                    strcpy(Out, join(7, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Rep)), CRLF, Out));
-                }
+            if(lof(File1) % 1024 != 0 )
+            {
+                Off +=   512;
+            }
+            strcpy(Dec, hex(Off));
+            Num = 65493;
+            if(lof(File1) % 1024 != 0 )
+            {
+                Num +=   512;
+            }
+            fseek(FP2, Num, 0);
+            GET(FP2, Bit, 1 );
+            if((UCHAR) * (Bit) != 33 && (UCHAR) * (Bit) != 49 )
+            {
+                Off = Bin2Dec(join( 3, "0", left(lpad(Bin( Hex2Dec( Dec)), 24, 48), 8), right(lpad(Bin( Hex2Dec( Dec)), 24, 48), 15)));
+            }
+            if(Off >= 4194304 && Off <= 8388607 )
+            {
+                Off -=   4194304;
+            }
+            if(Off >= 8388608 && Off <= 12582911 )
+            {
+                Off -=   8388608;
+            }
+            if(Off >= 12582912 && Off <= 16777215 )
+            {
+                Off -=   12582912;
+            }
+            if(Off < lof(File1))
+            {
+                fseek(FP2, Off, 0);
+                PUT(FP2, chr(Rep), 1 );
+                strcpy(Out, join(7, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Rep)), CRLF, Out));
             }
         }
     }
@@ -1063,4 +1060,3 @@ int main(int argc, char *argv[])
     printf("%s\n", Out);
     return 0;   /* End of main program */
 }
-
