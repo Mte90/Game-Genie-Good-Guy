@@ -6,9 +6,6 @@
 //              Translated for compiling with a C++ Compiler
 //                            On a nix OS
 // *********************************************************************
-// Additional lines may be needed
-#if defined( __cplusplus )
-#define overloaded
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -18,9 +15,7 @@
 #include <vector>
 typedef std::string::value_type charT;
 typedef std::string stdstr;
-#define _X(y) y
 using namespace std;
-#endif
 #include <wchar.h>      // dos/linux 
 #include <ctype.h>      // dos/linux
 #include <fcntl.h>      // dos/linux
@@ -44,9 +39,6 @@ using namespace std;
 // ***************************************************
 // Compiler Defines
 // ***************************************************
-#ifndef __cplusplus
-#error A C++ compiler is required
-#endif
 #include "./include/functions.c"
 
 // *************************************************
