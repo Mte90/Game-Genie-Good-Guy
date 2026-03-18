@@ -18,9 +18,8 @@
 #include <sys/stat.h>
 #include <stdbool.h>    // linux only
 #include <unistd.h>     // linux only
-#include <glib.h>
-#include <gio/gio.h>
-#include <glib/gstdio.h>
+
+#include "copyfile.h"
 
 #define __cdecl
 #define __stdcall
@@ -49,7 +48,6 @@ size_t  g_dum1_;  // dummy var for not used returns
 //               Standard Prototypes
 // *************************************************
 
-bool    gCopyFile (const gchar*, const gchar*, gboolean );
 char* BCX_TmpStr(size_t, size_t , int );
 char*   lcase (const char*);
 char*   ucase (const char*);
@@ -124,32 +122,6 @@ static char    Out[cSizeOfDefaultString];
 //                 Runtime Functions
 // *************************************************
 
-bool gCopyFile (const gchar*  source, const gchar*  dest, gboolean  overwrite)
-{
-    GError*  gerr = {0};
-    GFile*   fsrc = {0};
-    GFile*   fdest = {0};
-    GFileCopyFlags owflag = G_FILE_COPY_OVERWRITE;
-    if(overwrite )
-    {
-        owflag = G_FILE_COPY_NONE;
-    }
-    if(strncmp(source, "http:", 5) == 0 || strncmp(source, "https:", 6) == 0)
-    {
-        fsrc = g_file_new_for_uri( source);
-    }
-    else
-    {
-        fsrc = g_file_new_for_path( source);
-    }
-    fdest = g_file_new_for_path( dest);
-    if(g_file_copy(fsrc, fdest, owflag, NULL, NULL, NULL, &gerr))
-    {
-        return true;
-    }
-    fprintf(stderr, "%s\n", gerr->message);
-    return false;
-}
 #ifndef BCXTmpStrSize
 #define BCXTmpStrSize  2048
 #endif
