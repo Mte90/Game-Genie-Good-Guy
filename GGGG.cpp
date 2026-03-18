@@ -31,8 +31,6 @@ using namespace std;
 
 #include "copyfile.h"
 
-#define __cdecl
-#define __stdcall
 // ***************************************************
 // Compiler Defines
 // ***************************************************
