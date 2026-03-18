@@ -63,17 +63,15 @@ char*   trim (const char*);
 char*   left (const char*, int);
 char*   right (const char*, int);
 char* lpad (const char*, int, int );
-char*   replace (const char*, const char*, const char*);
+char*   replace (const char*, const char*, char);
 char*   hex (int);
 char*   Bin (int);
 char*   join (int, ... );
 char*   chr(int);
-char    *_strstr_(char*, char*);
 int     Bin2Dec (const char*);
 int     Hex2Dec (const char*);
 off_t   lof (const char*);
 int Split (char [][cSizeOfDefaultString], char*, const char*);
-static char    LF  [2] = {10, 0}; // Line Feed
 static char    CRLF[3] = {13, 10, 0}; // Carr Rtn & Line Feed
 
 // *************************************************
@@ -233,33 +231,27 @@ char *trim (const char *S)
 }
 
 
-char *replace (const char *src, const char *pat, const char *rep)
+char *replace (const char *src, const char *pat, char rep)
 {
-    size_t patsz, repsz, tmpsz, delta;
-    char *strtmp, *p, *q, *r;
-    if (!pat || !*pat)
+    size_t len = strlen(src);
+    char *ret = (char*)malloc(len + 1);
+    size_t i, r;
+    for (i = r = 0; i < len; ++i)
     {
-        strtmp = BCX_TmpStr(strlen(src), 1, 1);
-        if (!strtmp) return NULL;
-        return strcpy(strtmp, src);
+        if (strchr(pat, src[i]))
+        {
+            if (rep)
+            {
+                ret[r++] = rep;
+            }
+        }
+        else
+        {
+            ret[r++] = src[i];
+        }
     }
-    repsz = strlen(rep);
-    patsz = strlen(pat);
-    for (tmpsz = 0, p = (char*)src; (q = _strstr_(p, (char*)pat)) != 0; p = q + patsz)
-        tmpsz += (size_t) (q - p) + repsz;
-    tmpsz += strlen(p);
-    strtmp = BCX_TmpStr(tmpsz, 1, 1);
-    if (!strtmp) return NULL;
-    for (r = strtmp, p = (char*)src; (q = _strstr_(p, (char*)pat)) != 0; p = q + patsz)
-    {
-        delta = (size_t) (q - p);
-        memcpy(r, p, delta);
-        r += delta;
-        strcpy(r, rep);
-        r += repsz;
-    }
-    strcpy(r, p);
-    return strtmp;
+    ret[r] = '\0';
+    return ret;
 }
 
 
@@ -324,22 +316,6 @@ char* Bin(int number)
     char *strtmp = BCX_TmpStr( 2048, 1, 1);
     itoa(number, strtmp, 2);
     return strtmp;
-}
-
-
-char *_strstr_(char *String, char *Pattern)
-{
-    int   mi = -1;
-    while(Pattern[++mi])
-    {
-        if(String[mi] == 0) return 0;
-        if(String[mi] != Pattern[mi])
-        {
-            String++;
-            mi = -1;
-        }
-    }
-    return String;
 }
 
 
@@ -747,9 +723,9 @@ int main(int argc, char *argv[])
         printf("%s\n", "ERROR: ROM doesn't exists");
         exit(1);
     }
-    strcpy(Code, replace(Code, "-", ""));
-    strcpy(Code, replace(Code, "+", LF));
-    Codes = Split( Line, Code, LF);
+    strcpy(Code, replace(Code, "-", 0));
+    strcpy(Code, replace(Code, "+", '\n'));
+    Codes = Split( Line, Code, "\n");
     printf("%s%i\n", "Codes to inject: ", Codes);
     const char* ext = strrchr(File1, '.');
     if (ext)
