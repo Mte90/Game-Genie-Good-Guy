@@ -16,7 +16,6 @@
 typedef std::string::value_type charT;
 typedef std::string stdstr;
 using namespace std;
-#include <wchar.h>      // dos/linux 
 #include <ctype.h>      // dos/linux
 #include <fcntl.h>      // dos/linux
 #include <stdint.h>
@@ -24,7 +23,6 @@ using namespace std;
 #include <string.h>     // dos/linux
 #include <stddef.h>     // dos/linux
 #include <stdlib.h>     // dos/linux
-#include <time.h>       // dos/linux
 #include <stdarg.h>     // dos/linux
 #include <sys/types.h>
 #include <sys/stat.h>
