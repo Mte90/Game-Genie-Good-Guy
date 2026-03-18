@@ -27,7 +27,6 @@
 // ***************************************************
 // Compiler Defines
 // ***************************************************
-#include "./include/functions.c"
 
 // *************************************************
 //        User's GLOBAL ENUM blocks
@@ -313,7 +312,7 @@ char * join(int n, ...)
 char* Bin(int number)
 {
     char *strtmp = BCX_TmpStr( 2048, 1, 1);
-    itoa(number, strtmp, 2);
+    sprintf(strtmp, "%d", number);
     return strtmp;
 }
 
