@@ -220,14 +220,15 @@ char *mid (const char *S, int start, int length)
 }
 
 
-char *trim (const char *S)
+char *trim (const char *s)
 {
-    if(S[0] == 0) return (char*)S;
-    while(*S == 32 || (*S >= 9 && *S <= 13)) S++;
-    int i = strlen(S);
-    while( i > 0 && (S[i - 1] == 32 || (S[i - 1] >= 9 && S[i - 1] <= 13))) i--;
-    char *strtmp = BCX_TmpStr(i, 1, 1);
-    return (char*)memcpy(strtmp, S, i);
+    while (isspace(*s)) ++s;
+    size_t i = strlen(s);
+    while (i > 0 && isspace(s[i - 1])) --i;
+    char *ret = (char*)malloc(i + 1);
+    memcpy(ret, s, i);
+    ret[i + 1] = '\0';
+    return ret;
 }
 
 
