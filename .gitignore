@@ -1,4 +1,14 @@
+*.[ao]
 *.exe
+*.orig
+*.out
+*.patch
+*.rej
+
+*.gb
+*.nes
+*.smc
+
 UbxBasic 
 GGGG
 GGGG-cpp
