@@ -20,6 +20,7 @@
 #include <unistd.h>     // linux only
 
 #include "copyfile.h"
+#include "decode.h"
 
 // ***************************************************
 // Compiler Defines
@@ -74,16 +75,6 @@ static char    CRLF[3] = {13, 10, 0}; // Carr Rtn & Line Feed
 // *************************************************
 //          User Defined Types And Unions
 // *************************************************
-
-// A decoded game genie code.
-struct codebits
-{
-    uint32_t len;
-    uint32_t off;
-    uint32_t rep;
-    uint32_t cmp;
-};
-
 
 // *************************************************
 //            User Global Variables
@@ -364,315 +355,6 @@ char *_strlwr_(char *string)
 //       User Subs and Functions
 // ************************************
 
-static bool decodeGbGgMs(char *code, struct codebits *decoded)
-{
-    decoded->len = strlen(code);
-    if(decoded->len == 6)
-    {
-        strcpy(code, join(4, hex(Hex2Dec(mid(code, 6, 1)) ^ 15), mid(code, 3, 3), ":", left(code, 2)));
-        decoded->off = Hex2Dec(left( code, 4));
-        decoded->rep = Hex2Dec(right( code, 2));
-        decoded->cmp = 0;
-    }
-    else if(decoded->len == 9)
-    {
-        strcpy(code, join(7, hex(Hex2Dec(mid(code, 6, 1)) ^ 15), mid(code, 3, 3), ":", left(code, 2), ":", mid(code, 7, 1), mid(code, 9, 1)));
-        strcpy(Dec, lpad(Bin(Hex2Dec(mid(code, 9, 2))), 8, 48));
-        strcpy(code, join(2, left(code, 8), hex(Bin2Dec(join(2, mid(Dec, 7, 2), left(Dec, 6))) ^ 186)));
-        decoded->off = Hex2Dec(left( code, 4));
-        decoded->rep = Hex2Dec(mid( code, 6, 2));
-        decoded->cmp = Hex2Dec(right( code, 2));
-    }
-    else
-    {
-        fprintf(stderr, "%s: invalid code length\n", code);
-        return false;
-    }
-
-    return true;
-}
-
-static bool decodeGenesis(char *code, struct codebits *decoded)
-{
-    size_t num;
-
-    for(num = 0; code[num]; num += 1)
-    {
-        switch (code[num])
-        {
-            case 'A':
-                strcat(Dec, "00000");
-                break;
-            case 'B':
-                strcat(Dec, "00001");
-                break;
-            case 'C':
-                strcat(Dec, "00010");
-                break;
-            case 'D':
-                strcat(Dec, "00011");
-                break;
-            case 'E':
-                strcat(Dec, "00100");
-                break;
-            case 'F':
-                strcat(Dec, "00101");
-                break;
-            case 'G':
-                strcat(Dec, "00110");
-                break;
-            case 'H':
-                strcat(Dec, "00111");
-                break;
-            case 'J':
-                strcat(Dec, "01000");
-                break;
-            case 'K':
-                strcat(Dec, "01001");
-                break;
-            case 'L':
-                strcat(Dec, "01010");
-                break;
-            case 'M':
-                strcat(Dec, "01011");
-                break;
-            case 'N':
-                strcat(Dec, "01100");
-                break;
-            case 'P':
-                strcat(Dec, "01101");
-                break;
-            case 'R':
-                strcat(Dec, "01110");
-                break;
-            case 'S':
-                strcat(Dec, "01111");
-                break;
-            case 'T':
-                strcat(Dec, "10000");
-                break;
-            case 'V':
-                strcat(Dec, "10001");
-                break;
-            case 'W':
-                strcat(Dec, "10010");
-                break;
-            case 'X':
-                strcat(Dec, "10011");
-                break;
-            case 'Y':
-                strcat(Dec, "10100");
-                break;
-            case 'Z':
-                strcat(Dec, "10101");
-                break;
-            case '0':
-                strcat(Dec, "10110");
-                break;
-            case '1':
-                strcat(Dec, "10111");
-                break;
-            case '2':
-                strcat(Dec, "11000");
-                break;
-            case '3':
-                strcat(Dec, "11001");
-                break;
-            case '4':
-                strcat(Dec, "11010");
-                break;
-            case '5':
-                strcat(Dec, "11011");
-                break;
-            case '6':
-                strcat(Dec, "11100");
-                break;
-            case '7':
-                strcat(Dec, "11101");
-                break;
-            case '8':
-                strcat(Dec, "11110");
-                break;
-            case '9':
-                strcat(Dec, "11111");
-                break;
-            default:
-                fprintf(stderr, "%s: invalid code letter '%c'\n", code, code[num]);
-                return false;
-        }
-    }
-
-    decoded->len = strlen(code);
-    strcpy(code, join(6, mid(Dec, 17, 8), mid(Dec, 9, 8), right(Dec, 8), mid(Dec, 30, 3), mid(Dec, 25, 5), left(Dec, 8)));
-    strcpy(Dec, join(3, lpad(hex(Bin2Dec(left(code, 24))), 6, 48), ":", lpad(hex(Bin2Dec(right(code, 16))), 4, 48)));
-    decoded->off = Hex2Dec(left( Dec, 6));
-    decoded->cmp = Hex2Dec(mid( Dec, 8, 2));
-    decoded->rep = Hex2Dec(right( Dec, 2));
-
-    return true;
-}
-
-static bool decodeNES(char *code, struct codebits *decoded)
-{
-    size_t num;
-
-    for(num = 0; code[num]; num += 1)
-    {
-        switch (code[num])
-        {
-            case 'A':
-                strcat(Dec, "0000");
-                break;
-            case 'P':
-                strcat(Dec, "0001");
-                break;
-            case 'Z':
-                strcat(Dec, "0010");
-                break;
-            case 'L':
-                strcat(Dec, "0011");
-                break;
-            case 'G':
-                strcat(Dec, "0100");
-                break;
-            case 'I':
-                strcat(Dec, "0101");
-                break;
-            case 'T':
-                strcat(Dec, "0110");
-                break;
-            case 'Y':
-                strcat(Dec, "0111");
-                break;
-            case 'E':
-                strcat(Dec, "1000");
-                break;
-            case 'O':
-                strcat(Dec, "1001");
-                break;
-            case 'X':
-                strcat(Dec, "1010");
-                break;
-            case 'U':
-                strcat(Dec, "1011");
-                break;
-            case 'K':
-                strcat(Dec, "1100");
-                break;
-            case 'S':
-                strcat(Dec, "1101");
-                break;
-            case 'V':
-                strcat(Dec, "1110");
-                break;
-            case 'N':
-                strcat(Dec, "1111");
-                break;
-            default:
-                fprintf(stderr, "%s: invalid code letter '%c'\n", code, code[num]);
-                return false;
-        }
-    }
-
-    decoded->len = strlen(code);
-    if(decoded->len == 6)
-    {
-        strcpy(code, join(10, mid(Dec, 9, 1), mid(Dec, 14, 4), mid(Dec, 22, 3), mid(Dec, 5, 1), mid(Dec, 10, 4), mid(Dec, 18, 3), mid(Dec, 1, 1), mid(Dec, 6, 3), mid(Dec, 21, 1), mid(Dec, 2, 3)));
-        strcpy(Dec, join(3, lpad(hex(Bin2Dec(left(code, 16))), 4, 48), ":", lpad(hex(Bin2Dec(right(code, 8))), 2, 48)));
-        decoded->off = Hex2Dec(left( Dec, 4));
-        decoded->cmp = 0;
-        decoded->rep = Hex2Dec(right( Dec, 2));
-    }
-    else if(decoded->len == 8)
-    {
-        strcpy(code, join(14, mid(Dec, 9, 1), mid(Dec, 14, 4), mid(Dec, 22, 3), mid(Dec, 5, 1), mid(Dec, 10, 4), mid(Dec, 18, 3), mid(Dec, 1, 1), mid(Dec, 6, 3), mid(Dec, 29, 1), mid(Dec, 2, 3), mid(Dec, 25, 1), mid(Dec, 30, 3), mid(Dec, 21, 1), mid(Dec, 26, 3)));
-        strcpy(Dec, join(5, lpad(hex(Bin2Dec(left(code, 16))), 4, 48), ":", lpad(hex(Bin2Dec(mid(code, 17, 8))), 2, 48), ":", lpad(hex(Bin2Dec(right(code, 8))), 2, 48)));
-        decoded->off = Hex2Dec(left( Dec, 4)) - 49152;
-        decoded->cmp = Hex2Dec(right( Dec, 2));
-        decoded->rep = Hex2Dec(mid( Dec, 6, 2));
-    }
-    else
-    {
-        fprintf(stderr, "%s: invalid code length\n", code);
-        return false;
-    }
-
-    return true;
-}
-
-static bool decodeSNES(char *code, struct codebits *decoded)
-{
-    size_t num;
-
-    for(num = 0; code[num]; num += 1)
-    {
-        switch (code[num])
-        {
-            case 'D':
-                strcat(Dec, "0");
-                break;
-            case 'F':
-                strcat(Dec, "1");
-                break;
-            case '4':
-                strcat(Dec, "2");
-                break;
-            case '7':
-                strcat(Dec, "3");
-                break;
-            case '0':
-                strcat(Dec, "4");
-                break;
-            case '9':
-                strcat(Dec, "5");
-                break;
-            case '1':
-                strcat(Dec, "6");
-                break;
-            case '5':
-                strcat(Dec, "7");
-                break;
-            case '6':
-                strcat(Dec, "8");
-                break;
-            case 'B':
-                strcat(Dec, "9");
-                break;
-            case 'C':
-                strcat(Dec, "A");
-                break;
-            case '8':
-                strcat(Dec, "B");
-                break;
-            case 'A':
-                strcat(Dec, "C");
-                break;
-            case '2':
-                strcat(Dec, "D");
-                break;
-            case '3':
-                strcat(Dec, "E");
-                break;
-            case 'E':
-                strcat(Dec, "F");
-                break;
-            default:
-                fprintf(stderr, "%s: invalid code letter '%c'\n", code, code[num]);
-                return false;
-        }
-    }
-
-    decoded->len = strlen(code);
-    decoded->rep = Hex2Dec(left( Dec, 2));
-    strcpy(code, join(3, lpad(Bin(Hex2Dec(mid(Dec, 3, 2))), 8, 48), lpad(Bin(Hex2Dec(mid(Dec, 5, 2))), 8, 48), lpad(Bin(Hex2Dec(mid(Dec, 7, 2))), 8, 48)));
-    strcpy(Dec, join(7, mid(code, 11, 4), mid(code, 19, 4), left(code, 4), mid(code, 23, 2), mid(code, 9, 2), mid(code, 5, 4), mid(code, 15, 4)));
-    strcpy(code, join(5, lpad(hex(Bin2Dec(left(Dec, 8))), 2, 48), lpad(hex(Bin2Dec(mid(Dec, 9, 8))), 2, 48), lpad(hex(Bin2Dec(right(Dec, 8))), 2, 48), ":", hex(Rep)));
-    decoded->off = Hex2Dec(left( code, 6));
-    decoded->cmp = 0;
-
-    return true;
-}
-
 // *************************************************
 //                  Main Program
 // *************************************************
@@ -797,10 +479,10 @@ int main(int argc, char *argv[])
             if(Off < lof(File1))
             {
                 fseek(FP2, Off, 0);
-                PUT(FP2, chr(Cmp), 1 );
+                PUT(FP2, chr(Rep >> 8), 1 );
                 fseek(FP2, Off + 1, 0);
-                PUT(FP2, chr(Rep), 1 );
-                strcpy(Out, join(8, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), trim(hex(Rep)), CRLF, Out));
+                PUT(FP2, chr(Rep & 0xff), 1 );
+                strcpy(Out, join(8, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Rep)), CRLF, Out));
             }
         }
         if(strcmp(Type, "3") == 0)
@@ -809,7 +491,7 @@ int main(int argc, char *argv[])
             {
                 continue;
             }
-            Off = decoded.off;
+            Off = decoded.off + 0x8000 - 0xc000;
             Cmp = decoded.cmp;
             Rep = decoded.rep;
 
