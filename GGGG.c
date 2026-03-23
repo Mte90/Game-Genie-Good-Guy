@@ -89,19 +89,6 @@ static char    CRLF[3] = {13, 10, 0}; // Carr Rtn & Line Feed
 //            User Global Variables
 // *************************************************
 
-static int     Cmp;
-static int     Lnum;
-static int     Num;
-static int     Off;
-static int     Rep;
-static int     Codes;
-static FILE   *FP2;
-static char    Line[200][cSizeOfDefaultString];
-static char    Bit[cSizeOfDefaultString];
-static char    Dec[cSizeOfDefaultString];
-static char    Out[cSizeOfDefaultString];
-
-
 // *************************************************
 //               Standard Macros
 // *************************************************
@@ -397,6 +384,15 @@ static gg_type parse_gg_type(const char *type)
 
 int main(int argc, char *argv[])
 {
+    int Lnum, Num;
+    int Cmp, Off, Rep;
+    int Codes;
+    FILE *FP2;
+    static char Bit[cSizeOfDefaultString];
+    static char Dec[cSizeOfDefaultString];
+    static char Out[cSizeOfDefaultString];
+    static char Line[200][cSizeOfDefaultString];
+
     if(argc != 5)
     {
         fprintf(
