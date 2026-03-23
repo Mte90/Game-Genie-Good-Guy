@@ -30,6 +30,15 @@
 //        User's GLOBAL ENUM blocks
 // *************************************************
 
+typedef enum
+{
+    GG_TYPE_UNKNOWN = 0,
+    GG_TYPE_GBGGMS,
+    GG_TYPE_GENESIS,
+    GG_TYPE_NES,
+    GG_TYPE_SNES,
+} gg_type;
+
 // *************************************************
 //            System Defined Constants
 // *************************************************
@@ -110,6 +119,8 @@ static char    Out[cSizeOfDefaultString];
 // *************************************************
 //                 Runtime Functions
 // *************************************************
+
+#define streq(a, b) (strcmp(a, b) == 0)
 
 #ifndef BCXTmpStrSize
 #define BCXTmpStrSize  2048
@@ -355,6 +366,31 @@ char *_strlwr_(char *string)
 //       User Subs and Functions
 // ************************************
 
+static gg_type parse_gg_type(const char *type)
+{
+    if (streq(type, "1") || streq(type, "gb") || streq(type, "gg") || streq(type, "ms"))
+    {
+        return GG_TYPE_GBGGMS;
+    }
+
+    if (streq(type, "2") || streq(type, "genesis") || streq(type, "md") || streq(type, "megadrive"))
+    {
+        return GG_TYPE_GENESIS;
+    }
+
+    if (streq(type, "3") || streq(type, "nes"))
+    {
+        return GG_TYPE_NES;
+    }
+
+    if (streq(type, "4") || streq(type, "snes"))
+    {
+        return GG_TYPE_SNES;
+    }
+
+    return GG_TYPE_UNKNOWN;
+}
+
 // *************************************************
 //                  Main Program
 // *************************************************
@@ -363,12 +399,37 @@ int main(int argc, char *argv[])
 {
     if(argc != 5)
     {
-        printf("%s\n", "ERROR: Missing some parameters, check the readme");
+        fprintf(
+            stderr,
+            "Usage: GGGG <code> <type> <input> <output>\n"
+            "\n"
+            "Game Genie Code:\n"
+            "  1: XXX-XXX or XXX-XXX-XXX\n"
+            "  2: XXXX-XXXX\n"
+            "  3: XXXXXX or XXXXXXXX\n"
+            "  4: XXXX-XXXX\n"
+            "\n"
+            "System Type:\n"
+            "  1: Game Boy/Game Gear/Master System\n"
+            "  2: Genesis/Mega Drive\n"
+            "  3: Nintendo\n"
+            "  4: Super Nintendo\n"
+            "\n"
+            "Input: A valid ROM file for the <type> system.\n"
+            "Output: The file will be removed and patched.\n");
+        fprintf(stderr, "\n%s: ERROR: Missing some parameters\n", argv[0]);
         exit(1);
     }
     static char Code[cSizeOfDefaultString];
     strcpy(Code, argv[1]);
-    const char* Type = argv[2];
+
+    gg_type Type = parse_gg_type(argv[2]);
+    if (Type == GG_TYPE_UNKNOWN)
+    {
+        fprintf(stderr, "%s: %s: unknown system type\n", argv[0], argv[2]);
+        exit(1);
+    }
+
     const char* File1 = argv[3];
     const char* File2 = argv[4];
     remove(File2);
@@ -422,7 +483,7 @@ int main(int argc, char *argv[])
                 printf("%s\n", Out);
             }
         }
-        if(strcmp(Type, "1") == 0)
+        if (Type == GG_TYPE_GBGGMS)
         {
             if (!decodeGbGgMs(Code, &decoded))
             {
@@ -466,7 +527,7 @@ int main(int argc, char *argv[])
 
             }
         }
-        if(strcmp(Type, "2") == 0)
+        if (Type == GG_TYPE_GENESIS)
         {
             if (!decodeGenesis(Code, &decoded))
             {
@@ -485,7 +546,7 @@ int main(int argc, char *argv[])
                 strcpy(Out, join(8, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Rep)), CRLF, Out));
             }
         }
-        if(strcmp(Type, "3") == 0)
+        if (Type == GG_TYPE_NES)
         {
             if (!decodeNES(Code, &decoded))
             {
@@ -546,7 +607,7 @@ int main(int argc, char *argv[])
 
             }
         }
-        if(strcmp(Type, "4") == 0)
+        if (Type == GG_TYPE_SNES)
         {
             if (!decodeSNES(Code, &decoded))
             {
