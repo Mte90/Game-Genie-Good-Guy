@@ -21,6 +21,7 @@ using namespace std;
 #include <stdint.h>
 #include <stdio.h>      // dos/linux
 #include <string.h>     // dos/linux
+#include <strings.h>
 #include <stddef.h>     // dos/linux
 #include <stdlib.h>     // dos/linux
 #include <stdarg.h>     // dos/linux
@@ -67,12 +68,6 @@ size_t  g_dum1_;  // dummy var for not used returns
 // *************************************************
 
 char*   BCX_TmpStr(size_t, size_t = 0, int = 1);
-char*   lcase (const char*);
-stdstr lcase(stdstr &, int = 0);
-charT lower(charT arg)
-{
-    return std::use_facet<std::ctype<charT> >(std::locale()).tolower(arg);
-}
 char*   ucase (const char*);
 stdstr ucase(stdstr &, int = 0);
 charT upper(charT arg)
@@ -82,7 +77,6 @@ charT upper(charT arg)
 std::string   mid (std::string, size_t, int = -1);
 char*   mid (const char*, int, int = -1);
 char*   _strupr_(char *);
-char*   _strlwr_(char *);
 std::string   trim (std::string);
 char*   trim (const char*);
 std::string   left (std::string, int);
@@ -275,21 +269,6 @@ char *ucase (const char *S)
 }
 
 
-stdstr lcase(stdstr & m, int f)
-{
-    stdstr s;
-    s = m;
-    std::transform(s.begin(), s.end(), s.begin(), lower);
-    if(f) m = s;
-    return s;
-}
-char *lcase (const char *S)
-{
-    char *strtmp = BCX_TmpStr(strlen(S), 1, 1);
-    return _strlwr_(strcpy(strtmp, (char*)S));
-}
-
-
 char *hex (int a)
 {
     char *strtmp = BCX_TmpStr(16, 1, 1);
@@ -399,19 +378,6 @@ char *_strupr_(char *string)
     return string;
 }
 
-char *_strlwr_(char *string)
-{
-    char *s;
-
-    if (string)
-    {
-        for (s = string; *s; ++s)
-            *s = tolower(*s);
-    }
-    return string;
-}
-
-
 
 // ************************************
 //       User Subs and Functions
@@ -505,11 +471,7 @@ int main(int argc, char *argv[])
     const char* ext = strrchr(File1, '.');
     if (ext)
     {
-        strcpy(Bit, lcase(ext + 1));
-    }
-    else
-    {
-        Bit[0] = 0;
+        ext++;
     }
     printf("ROM to patch: %s\n", File1);
     printf("Patch at: %s\n", File2);
@@ -529,7 +491,7 @@ int main(int argc, char *argv[])
         *Dec = 0;
         if(strchr(Code, ':'))
         {
-            if(strcmp(Bit, "pce") == 0 || ( strcmp(Bit, "sms") == 0 && lof(File1) % 1024))
+            if(ext && (strcasecmp(ext, "pce") == 0 || (strcasecmp(ext, "sms") == 0 && lof(File1) % 1024)))
             {
                 Off +=   512;
             }

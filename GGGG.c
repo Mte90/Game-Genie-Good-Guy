@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdio.h>      // dos/linux
 #include <string.h>     // dos/linux
+#include <strings.h>
 #include <stddef.h>     // dos/linux
 #include <stdlib.h>     // dos/linux
 #include <stdarg.h>     // dos/linux
@@ -57,11 +58,9 @@ size_t  g_dum1_;  // dummy var for not used returns
 // *************************************************
 
 char* BCX_TmpStr(size_t, size_t , int );
-char*   lcase (const char*);
 char*   ucase (const char*);
 char* mid (const char*, int, int );
 char*   _strupr_(char *);
-char*   _strlwr_(char *);
 char*   trim (const char*);
 char*   left (const char*, int);
 char*   right (const char*, int);
@@ -219,13 +218,6 @@ char *ucase (const char *S)
 }
 
 
-char *lcase (const char *S)
-{
-    char *strtmp = BCX_TmpStr(strlen(S), 1, 1);
-    return _strlwr_(strcpy(strtmp, (char*)S));
-}
-
-
 char *hex (int a)
 {
     char *strtmp = BCX_TmpStr(16, 1, 1);
@@ -335,19 +327,6 @@ char *_strupr_(char *string)
     return string;
 }
 
-char *_strlwr_(char *string)
-{
-    char *s;
-
-    if (string)
-    {
-        for (s = string; *s; ++s)
-            *s = tolower(*s);
-    }
-    return string;
-}
-
-
 
 // ************************************
 //       User Subs and Functions
@@ -441,11 +420,7 @@ int main(int argc, char *argv[])
     const char* ext = strrchr(File1, '.');
     if (ext)
     {
-        strcpy(Bit, lcase(ext + 1));
-    }
-    else
-    {
-        Bit[0] = 0;
+        ext++;
     }
     printf("ROM to patch: %s\n", File1);
     printf("Patch at: %s\n", File2);
@@ -465,7 +440,7 @@ int main(int argc, char *argv[])
         *Dec = 0;
         if(strchr(Code, ':'))
         {
-            if(strcmp(Bit, "pce") == 0 || ( strcmp(Bit, "sms") == 0 && lof(File1) % 1024))
+            if(ext && (strcasecmp(ext, "pce") == 0 || (strcasecmp(ext, "sms") == 0 && lof(File1) % 1024)))
             {
                 Off +=   512;
             }
