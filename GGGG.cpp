@@ -70,11 +70,7 @@ std::string   left (std::string, int);
 char*   left (const char*, int);
 std::string   right (std::string, int);
 char*   right (const char*, int);
-char*   lpad (const char*, int, int = 32);
-char*   Bin (int);
-char*   join (int, ... );
 char*   chr(int);
-int     Bin2Dec (const char*);
 int     Hex2Dec (const char*);
 off_t   lof (const char*);
 
@@ -162,59 +158,10 @@ char *right (const char *S, int length)
 }
 
 
-char *lpad (const char *a, int L, int c)
-{
-    char *strtmp;
-    L = L - strlen(a);
-    if(L < 1) return (char*)a;
-    strtmp = BCX_TmpStr(L, 1, 1);
-    memset(strtmp, c, L);
-    return strcat(strtmp, a);
-}
-
-
 char *chr (int a)
 {
     char *strtmp = BCX_TmpStr(2, 1, 1);
     strtmp[0]  = a;
-    return strtmp;
-}
-
-
-char * join(int n, ...)
-{
-    int i = n, tmplen = 0;
-    char *s_;
-    char *strtmp;
-    va_list marker;
-    va_start(marker, n); // Initialize variable arguments
-    while(i-- > 0)
-    {
-        s_ = va_arg(marker, char *);
-        if(s_) tmplen += strlen(s_);
-    }
-    strtmp = BCX_TmpStr(tmplen, 1, 1);
-    va_end(marker); // Reset variable arguments
-    i = n;
-    va_start(marker, n); // Initialize variable arguments
-    while(i-- > 0)
-    {
-        s_ = va_arg(marker, char *);
-        if(s_) strcat(strtmp, s_);
-    }
-    va_end(marker); // Reset variable arguments
-    return strtmp;
-}
-
-
-char* Bin(int number)
-{
-    char *strtmp = BCX_TmpStr( 32, 1, 1);
-    int i;
-    for (i = 0; i < 32; ++i)
-    {
-        strtmp[i] = (number & (1 << (31 - i))) ? '1' : '0';
-    }
     return strtmp;
 }
 
@@ -250,19 +197,6 @@ static int split_normalize_codes(char Buf[][cSizeOfDefaultString], char *T)
         *out = '\0';
     } while((token = strtok(NULL, "+\n")) != NULL);
     return count;
-}
-
-
-int Bin2Dec (const char *cptr)
-{
-    int i, j = 0;
-    while(cptr && *cptr && strchr("01", *cptr))
-    {
-        i = *cptr++ - '0';
-        j <<= 1;
-        j |= (i & 0x01);
-    }
-    return(j);
 }
 
 
@@ -539,7 +473,7 @@ int main(int argc, char *argv[])
             GET(FP2, Bit, 1 );
             if((UCHAR) * (Bit) != 33 && (UCHAR) * (Bit) != 49 )
             {
-                Off = Bin2Dec(join( 3, "0", left(lpad(Bin(Off), 24, 48), 8), right(lpad(Bin(Off), 24, 48), 15)));
+                Off = ((Off & 0xff000000) >> 9) | (Off & 0x7fff);
             }
             if(Off >= 4194304 && Off <= 8388607 )
             {
