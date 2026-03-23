@@ -58,13 +58,9 @@ size_t  g_dum1_;  // dummy var for not used returns
 // *************************************************
 
 char* BCX_TmpStr(size_t, size_t , int );
-char*   ucase (const char*);
-char*   _strupr_(char *);
-char*   trim (const char*);
 char*   left (const char*, int);
 char*   right (const char*, int);
 char* lpad (const char*, int, int );
-char*   replace (const char*, const char*, char);
 char*   hex (int);
 char*   Bin (int);
 char*   join (int, ... );
@@ -72,7 +68,6 @@ char*   chr(int);
 int     Bin2Dec (const char*);
 int     Hex2Dec (const char*);
 off_t   lof (const char*);
-int Split (char [][cSizeOfDefaultString], char*, const char*);
 
 // *************************************************
 //                System Variables
@@ -161,49 +156,6 @@ char *lpad (const char *a, int L, int c)
 }
 
 
-char *trim (const char *s)
-{
-    while (isspace(*s)) ++s;
-    size_t i = strlen(s);
-    while (i > 0 && isspace(s[i - 1])) --i;
-    char *ret = (char*)malloc(i + 1);
-    memcpy(ret, s, i);
-    ret[i + 1] = '\0';
-    return ret;
-}
-
-
-char *replace (const char *src, const char *pat, char rep)
-{
-    size_t len = strlen(src);
-    char *ret = (char*)malloc(len + 1);
-    size_t i, r;
-    for (i = r = 0; i < len; ++i)
-    {
-        if (strchr(pat, src[i]))
-        {
-            if (rep)
-            {
-                ret[r++] = rep;
-            }
-        }
-        else
-        {
-            ret[r++] = src[i];
-        }
-    }
-    ret[r] = '\0';
-    return ret;
-}
-
-
-char *ucase (const char *S)
-{
-    char *strtmp = BCX_TmpStr(strlen(S), 1, 1);
-    return _strupr_(strcpy(strtmp, (char*)S));
-}
-
-
 char *hex (int a)
 {
     char *strtmp = BCX_TmpStr(16, 1, 1);
@@ -267,15 +219,27 @@ off_t lof (const char * FileName)
         return sb.st_size;
     return 0;
 }
-int Split (char Buf[][cSizeOfDefaultString], char *T, const char *Delim)
+
+
+static int split_normalize_codes(char Buf[][cSizeOfDefaultString], char *T)
 {
     int count = 0;
     char *token;
-    token = strtok(T, Delim);
+    token = strtok(T, "+\n");
     do
     {
-        strcpy(Buf[count++], token);
-    } while((token = strtok(NULL, Delim)) != NULL);
+        char *out = Buf[count++];
+        while (*token)
+        {
+            if (*token != '-' && !isspace(*token))
+            {
+                *out = toupper(*token);
+                ++out;
+            }
+            ++token;
+        }
+        *out = '\0';
+    } while((token = strtok(NULL, "+\n")) != NULL);
     return count;
 }
 
@@ -298,19 +262,6 @@ int Hex2Dec (const char *szInput)
     int ret = 0;
     sscanf(szInput, "%x", &ret);
     return ret;
-}
-
-
-char *_strupr_(char *string)
-{
-    char *s;
-
-    if (string)
-    {
-        for(s = string; *s; ++s)
-            *s = toupper(*s);
-    }
-    return string;
 }
 
 
@@ -381,7 +332,6 @@ int main(int argc, char *argv[])
         exit(1);
     }
     static char Code[cSizeOfDefaultString];
-    strcpy(Code, argv[1]);
 
     gg_type Type = parse_gg_type(argv[2]);
     if (Type == GG_TYPE_UNKNOWN)
@@ -398,9 +348,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "%s: ERROR: ROM doesn't exists\n", argv[0]);
         exit(1);
     }
-    strcpy(Code, replace(Code, "-", 0));
-    strcpy(Code, replace(Code, "+", '\n'));
-    Codes = Split( Line, Code, "\n");
+    Codes = split_normalize_codes(Line, argv[1]);
     printf("Codes to inject: %i\n", Codes);
     const char* ext = strrchr(File1, '.');
     if (ext)
@@ -419,7 +367,6 @@ int main(int argc, char *argv[])
     {
         struct codebits decoded;
 
-        strcpy(Line[Lnum], trim(ucase(Line[Lnum])));
         strcpy(Code, Line[Lnum]);
         printf("Parsing code: %s\n", Code);
         *Dec = 0;
