@@ -435,13 +435,13 @@ int main(int argc, char *argv[])
     remove(File2);
     if(!gCopyFile (File1, File2,true))
     {
-        printf("%s\n", "ERROR: ROM doesn't exists");
+        fprintf(stderr, "%s: ERROR: ROM doesn't exists\n", argv[0]);
         exit(1);
     }
     strcpy(Code, replace(Code, "-", 0));
     strcpy(Code, replace(Code, "+", '\n'));
     Codes = Split( Line, Code, "\n");
-    printf("%s%i\n", "Codes to inject: ", Codes);
+    printf("Codes to inject: %i\n", Codes);
     const char* ext = strrchr(File1, '.');
     if (ext)
     {
@@ -451,21 +451,21 @@ int main(int argc, char *argv[])
     {
         Bit[0] = 0;
     }
-    printf("%s%s\n", "Rom to patch: ", File1);
-    printf("%s%s\n", "Patch at: ", File2);
+    printf("ROM to patch: %s\n", File1);
+    printf("Patch at: %s\n", File2);
     if((FP2 = fopen(File2, "rb+")) == 0)
     {
-        fprintf(stderr, "Can't open file %s\n", File2);
+        fprintf(stderr, "%s: Can't open file %s\n", argv[0], File2);
         exit(1);
     }
-    printf("%s%s\n", CRLF, "Log:");
+    printf("\nLog:\n");
     for(Lnum = 0; Lnum < Codes; Lnum += 1)
     {
         struct codebits decoded;
 
         strcpy(Line[Lnum], trim(ucase(Line[Lnum])));
         strcpy(Code, Line[Lnum]);
-        printf("%s%s\n", "Parsing code: ", Code);
+        printf("Parsing code: %s\n", Code);
         *Dec = 0;
         if(strchr(Code, ':'))
         {
@@ -659,7 +659,7 @@ int main(int argc, char *argv[])
         fclose(FP2);
         FP2 = NULL;
     }
-    printf("%s\n", "Final Changes:");
+    printf("Final Changes:\n");
     printf("%s\n", Out);
     return 0;   /* End of main program */
 }
