@@ -61,7 +61,6 @@ char* BCX_TmpStr(size_t, size_t , int );
 char*   left (const char*, int);
 char*   right (const char*, int);
 char* lpad (const char*, int, int );
-char*   hex (int);
 char*   Bin (int);
 char*   join (int, ... );
 char*   chr(int);
@@ -153,14 +152,6 @@ char *lpad (const char *a, int L, int c)
     strtmp = BCX_TmpStr(L, 1, 1);
     memset(strtmp, c, L);
     return strcat(strtmp, a);
-}
-
-
-char *hex (int a)
-{
-    char *strtmp = BCX_TmpStr(16, 1, 1);
-    sprintf(strtmp, "%X", a);
-    return strtmp;
 }
 
 
@@ -305,7 +296,6 @@ int main(int argc, char *argv[])
     int Codes;
     FILE *FP2;
     static char Bit[cSizeOfDefaultString];
-    static char Dec[cSizeOfDefaultString];
     static char Line[200][cSizeOfDefaultString];
 
     if(argc != 5)
@@ -369,7 +359,6 @@ int main(int argc, char *argv[])
 
         strcpy(Code, Line[Lnum]);
         printf("Parsing code: %s\n", Code);
-        *Dec = 0;
         if(strchr(Code, ':'))
         {
             if(ext && (strcasecmp(ext, "pce") == 0 || (strcasecmp(ext, "sms") == 0 && lof(File1) % 1024)))
@@ -523,7 +512,6 @@ int main(int argc, char *argv[])
             {
                 Off +=   512;
             }
-            strcpy(Dec, hex(Off));
             Num = 65493;
             if(lof(File1) % 1024 != 0 )
             {
@@ -533,7 +521,7 @@ int main(int argc, char *argv[])
             GET(FP2, Bit, 1 );
             if((UCHAR) * (Bit) != 33 && (UCHAR) * (Bit) != 49 )
             {
-                Off = Bin2Dec(join( 3, "0", left(lpad(Bin( Hex2Dec( Dec)), 24, 48), 8), right(lpad(Bin( Hex2Dec( Dec)), 24, 48), 15)));
+                Off = Bin2Dec(join( 3, "0", left(lpad(Bin(Off), 24, 48), 8), right(lpad(Bin(Off), 24, 48), 15)));
             }
             if(Off >= 4194304 && Off <= 8388607 )
             {
