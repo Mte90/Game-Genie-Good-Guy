@@ -52,7 +52,6 @@ typedef enum
 //            System Defined Constants
 // *************************************************
 
-typedef unsigned char UCHAR;
 size_t  g_dum1_;  // dummy var for not used returns
 #define cSizeOfDefaultString 2048
 
@@ -247,7 +246,7 @@ int main(int argc, char *argv[])
     int Cmp, Off, Rep;
     int Codes;
     FILE *FP2;
-    static char Bit[cSizeOfDefaultString];
+    unsigned char c;
     static char Line[200][cSizeOfDefaultString];
 
     if(argc != 5)
@@ -273,7 +272,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "\n%s: ERROR: Missing some parameters\n", argv[0]);
         exit(1);
     }
-    static char Code[cSizeOfDefaultString];
 
     gg_type Type = parse_gg_type(argv[2]);
     if (Type == GG_TYPE_UNKNOWN)
@@ -308,8 +306,8 @@ int main(int argc, char *argv[])
     for(Lnum = 0; Lnum < Codes; Lnum += 1)
     {
         struct codebits decoded;
+        const char *Code = Line[Lnum];
 
-        strcpy(Code, Line[Lnum]);
         printf("Parsing code: %s\n", Code);
         if(strchr(Code, ':'))
         {
@@ -357,8 +355,8 @@ int main(int argc, char *argv[])
                     if(Off < lof(File1))
                     {
                         fseek(FP2, Off, 0);
-                        GET(FP2, Code, 1 );
-                        if((UCHAR) * (Code) == Cmp )
+                        GET(FP2, &c, 1 );
+                        if (c == Cmp)
                         {
                             fseek(FP2, Off, 0);
                             PUT(FP2, chr(Rep), 1 );
@@ -437,8 +435,8 @@ int main(int argc, char *argv[])
                     if(Off < lof(File1))
                     {
                         fseek(FP2, Off, 0);
-                        GET(FP2, Code, 1 );
-                        if((UCHAR) * (Code) == Cmp )
+                        GET(FP2, &c, 1);
+                        if (c == Cmp)
                         {
                             fseek(FP2, Off, 0);
                             PUT(FP2, chr(Rep), 1 );
@@ -470,8 +468,8 @@ int main(int argc, char *argv[])
                 Num +=   512;
             }
             fseek(FP2, Num, 0);
-            GET(FP2, Bit, 1 );
-            if((UCHAR) * (Bit) != 33 && (UCHAR) * (Bit) != 49 )
+            GET(FP2, &c, 1 );
+            if (c != 33 && c != 49)
             {
                 Off = ((Off & 0xff000000) >> 9) | (Off & 0x7fff);
             }
