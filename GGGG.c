@@ -59,7 +59,6 @@ size_t  g_dum1_;  // dummy var for not used returns
 
 char* BCX_TmpStr(size_t, size_t , int );
 char*   ucase (const char*);
-char* mid (const char*, int, int );
 char*   _strupr_(char *);
 char*   trim (const char*);
 char*   left (const char*, int);
@@ -74,7 +73,6 @@ int     Bin2Dec (const char*);
 int     Hex2Dec (const char*);
 off_t   lof (const char*);
 int Split (char [][cSizeOfDefaultString], char*, const char*);
-static char    CRLF[3] = {13, 10, 0}; // Carr Rtn & Line Feed
 
 // *************************************************
 //                System Variables
@@ -160,18 +158,6 @@ char *lpad (const char *a, int L, int c)
     strtmp = BCX_TmpStr(L, 1, 1);
     memset(strtmp, c, L);
     return strcat(strtmp, a);
-}
-
-
-char *mid (const char *S, int start, int length)
-{
-    char *strtmp;
-    int tmplen = strlen(S);
-    if(start > tmplen || start < 1) return BCX_TmpStr(1, 1, 1);
-    if (length < 0 || length > (tmplen - start) + 1)
-        length = (tmplen - start) + 1;
-    strtmp = BCX_TmpStr(length, 1, 1);
-    return (char*)memcpy(strtmp, &S[start - 1], length);
 }
 
 
@@ -369,7 +355,6 @@ int main(int argc, char *argv[])
     FILE *FP2;
     static char Bit[cSizeOfDefaultString];
     static char Dec[cSizeOfDefaultString];
-    static char Out[cSizeOfDefaultString];
     static char Line[200][cSizeOfDefaultString];
 
     if(argc != 5)
@@ -450,8 +435,7 @@ int main(int argc, char *argv[])
             {
                 fseek(FP2, Off, 0);
                 PUT(FP2, chr(Rep), 1 );
-                strcpy(Out, join(3, Line[Lnum], CRLF, Out));
-                printf("%s\n", Out);
+                printf("%s\n", Line[Lnum]);
             }
         }
         if (Type == GG_TYPE_GBGGMS)
@@ -472,7 +456,7 @@ int main(int argc, char *argv[])
                     {
                         fseek(FP2, Off, 0);
                         PUT(FP2, chr(Rep), 1 );
-                        strcpy(Out, join(9, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), ":", trim(hex(Rep)), CRLF, Out));
+                        printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                     }
                     Off +=   8192;
                 }
@@ -490,7 +474,7 @@ int main(int argc, char *argv[])
                         {
                             fseek(FP2, Off, 0);
                             PUT(FP2, chr(Rep), 1 );
-                            strcpy(Out, join(9, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), ":", trim(hex(Rep)), CRLF, Out));
+                            printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                         }
                     }
                     Off +=   8192;
@@ -514,7 +498,7 @@ int main(int argc, char *argv[])
                 PUT(FP2, chr(Rep >> 8), 1 );
                 fseek(FP2, Off + 1, 0);
                 PUT(FP2, chr(Rep & 0xff), 1 );
-                strcpy(Out, join(8, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Rep)), CRLF, Out));
+                printf("%s - %X:%X\n", Line[Lnum], Off, Rep);
             }
         }
         if (Type == GG_TYPE_NES)
@@ -541,7 +525,7 @@ int main(int argc, char *argv[])
                         {
                             fseek(FP2, Off, 0);
                             PUT(FP2, chr(Rep), 1 );
-                            strcpy(Out, join(9, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), ":", trim(hex(Rep)), CRLF, Out));
+                            printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                         }
                         Off +=   8192;
                     }
@@ -551,7 +535,7 @@ int main(int argc, char *argv[])
                 {
                     fseek(FP2, Off, 0);
                     PUT(FP2, chr(Rep), 1 );
-                    strcpy(Out, join(9, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), ":", trim(hex(Rep)), CRLF, Out));
+                    printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                 }
             }
             if(decoded.len == 8)
@@ -570,7 +554,7 @@ int main(int argc, char *argv[])
                         {
                             fseek(FP2, Off, 0);
                             PUT(FP2, chr(Rep), 1 );
-                            strcpy(Out, join(9, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Cmp)), ":", trim(hex(Rep)), CRLF, Out));
+                            printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                         }
                     }
                     Off +=   8192;
@@ -620,7 +604,7 @@ int main(int argc, char *argv[])
             {
                 fseek(FP2, Off, 0);
                 PUT(FP2, chr(Rep), 1 );
-                strcpy(Out, join(7, Line[Lnum], " - ", trim(hex(Off)), ":", trim(hex(Rep)), CRLF, Out));
+                printf("%s - %X:%X\n", Line[Lnum], Off, Rep);
             }
         }
     }
@@ -630,7 +614,5 @@ int main(int argc, char *argv[])
         fclose(FP2);
         FP2 = NULL;
     }
-    printf("Final Changes:\n");
-    printf("%s\n", Out);
     return 0;   /* End of main program */
 }
