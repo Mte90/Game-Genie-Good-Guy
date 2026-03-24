@@ -36,6 +36,7 @@ The idea of the new project is to get that tool (or the patching engine) running
 
 Use that numbers to define the rom type
 
+* *0*: Raw dump
 * *1*: Game Boy/Gear/Master System
 * *2*: Genesis/Mega Drive (no SMD roms)
 * *3*: Nintendo

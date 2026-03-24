@@ -34,6 +34,8 @@ struct codebits
     uint32_t cmp;
 };
 
+// Raw offset & value.
+bool decodeRaw(const char *code, struct codebits *decoded);
 // Game Boy, Game Gear, Master System.
 bool decodeGbGgMs(const char *code, struct codebits *decoded);
 // Sega Genesis/Mega Drive.

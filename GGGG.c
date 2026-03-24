@@ -33,7 +33,8 @@
 
 typedef enum
 {
-    GG_TYPE_UNKNOWN = 0,
+    GG_TYPE_UNKNOWN = -1,
+    GG_TYPE_RAW = 0,
     GG_TYPE_GBGGMS,
     GG_TYPE_GENESIS,
     GG_TYPE_NES,
@@ -164,6 +165,11 @@ static int split_normalize_codes(char Buf[][cSizeOfDefaultString], char *T)
 
 static gg_type parse_gg_type(const char *type)
 {
+    if (streq(type, "0") || streq(type, "raw"))
+    {
+        return GG_TYPE_RAW;
+    }
+
     if (streq(type, "1") || streq(type, "gb") || streq(type, "gg") || streq(type, "ms"))
     {
         return GG_TYPE_GBGGMS;
@@ -207,12 +213,14 @@ int main(int argc, char *argv[])
             "Usage: GGGG <code> <type> <input> <output>\n"
             "\n"
             "Game Genie Code:\n"
+            "  0: <offset>:<value> (both in hex, value is 8-bit)\n"
             "  1: XXX-XXX or XXX-XXX-XXX\n"
             "  2: XXXX-XXXX\n"
             "  3: XXXXXX or XXXXXXXX\n"
             "  4: XXXX-XXXX\n"
             "\n"
             "System Type:\n"
+            "  0: Raw dump\n"
             "  1: Game Boy/Game Gear/Master System\n"
             "  2: Genesis/Mega Drive\n"
             "  3: Nintendo\n"
@@ -260,12 +268,16 @@ int main(int argc, char *argv[])
         const char *Code = Line[Lnum];
 
         printf("Parsing code: %s\n", Code);
-        if(strchr(Code, ':'))
+        if (Type == GG_TYPE_RAW)
         {
-            if (sscanf(Code, "%x:%x", &Off, &Rep) != 2)
+            if (!decodeRaw(Code, &decoded))
             {
                 continue;
             }
+            Off = decoded.off;
+            Cmp = decoded.cmp;
+            Rep = decoded.rep;
+
             if(ext && (strcasecmp(ext, "pce") == 0 || (strcasecmp(ext, "sms") == 0 && lof(File1) % 1024)))
             {
                 Off +=   512;

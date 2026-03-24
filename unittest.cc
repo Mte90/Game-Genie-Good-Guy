@@ -75,6 +75,20 @@ void decode_tests(
   }
 }
 
+TEST(Decode, Raw) {
+  std::vector<std::string> codes = {
+    "00:00",
+    "ff:ab",
+    "12345678:ee",
+  };
+  std::vector<struct codebits> exp = {
+    {0, 0, 0, 0},
+    {0, 0xff, 0xab, 0},
+    {0, 0x12345678, 0xee, 0},
+  };
+  decode_tests(codes, exp, decodeRaw);
+}
+
 TEST(Decode, GbGgMs) {
   std::vector<std::string> codes = {
     "000-FEF-080",

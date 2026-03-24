@@ -20,6 +20,23 @@
 
 #include "decode.h"
 
+bool decodeRaw(const char *code, struct codebits *decoded)
+{
+    int addr, value;
+    if (sscanf(code, "%x:%x", &addr, &value) != 2)
+    {
+        fprintf(stderr, "%s: raw codes must use <address>:<value> syntax\n", code);
+        return false;
+    }
+
+    decoded->len = 0;
+    decoded->off = addr;
+    decoded->rep = value;
+    decoded->cmp = 0;
+
+    return true;
+}
+
 bool decodeGbGgMs(const char *code, struct codebits *decoded)
 {
     size_t num;
