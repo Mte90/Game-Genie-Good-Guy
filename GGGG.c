@@ -57,8 +57,6 @@ size_t  g_dum1_;  // dummy var for not used returns
 //               Standard Prototypes
 // *************************************************
 
-char* BCX_TmpStr(size_t, size_t , int );
-char*   chr(int);
 off_t   lof (const char*);
 
 // *************************************************
@@ -92,37 +90,6 @@ off_t   lof (const char*);
 // *************************************************
 
 #define streq(a, b) (strcmp(a, b) == 0)
-
-#ifndef BCXTmpStrSize
-#define BCXTmpStrSize  2048
-#endif
-char *BCX_TmpStr (size_t Bites, size_t  iPad, int iAlloc)
-{
-    static int   StrCnt;
-    static char *StrFunc[BCXTmpStrSize];
-    StrCnt = (StrCnt + 1) & (BCXTmpStrSize - 1);
-    if(StrFunc[StrCnt]) {
-        free (StrFunc[StrCnt]);
-        StrFunc[StrCnt] = NULL;
-    }
-#if defined BCX_MAX_VAR_SIZE
-    if(Bites * sizeof(char) > BCX_MAX_VAR_SIZE)
-    {
-        printf("Buffer Overflow caught in BCX_TmpStr - requested space of %d EXCEEDS %d\n", (int)(Bites * sizeof(char)), BCX_MAX_VAR_SIZE);
-        abort();
-    }
-#endif
-    if(iAlloc) StrFunc[StrCnt] = (char*)calloc(Bites + iPad + 1, sizeof(char));
-    return StrFunc[StrCnt];
-}
-
-
-char *chr (int a)
-{
-    char *strtmp = BCX_TmpStr(2, 1, 1);
-    strtmp[0]  = a;
-    return strtmp;
-}
 
 
 off_t lof (const char * FileName)
@@ -285,7 +252,8 @@ int main(int argc, char *argv[])
             if(Off < lof(File1))
             {
                 fseek(FP2, Off, 0);
-                PUT(FP2, chr(Rep), 1 );
+                c = Rep;
+                PUT(FP2, &c, 1);
                 printf("%s\n", Line[Lnum]);
             }
         }
@@ -306,7 +274,8 @@ int main(int argc, char *argv[])
                     if(Off < lof(File1))
                     {
                         fseek(FP2, Off, 0);
-                        PUT(FP2, chr(Rep), 1 );
+                        c = Rep;
+                        PUT(FP2, &c, 1);
                         printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                     }
                     Off +=   8192;
@@ -324,7 +293,8 @@ int main(int argc, char *argv[])
                         if (c == Cmp)
                         {
                             fseek(FP2, Off, 0);
-                            PUT(FP2, chr(Rep), 1 );
+                            c = Rep;
+                            PUT(FP2, &c, 1);
                             printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                         }
                     }
@@ -346,9 +316,11 @@ int main(int argc, char *argv[])
             if(Off < lof(File1))
             {
                 fseek(FP2, Off, 0);
-                PUT(FP2, chr(Rep >> 8), 1 );
+                c = Rep >> 8;
+                PUT(FP2, &c, 1);
                 fseek(FP2, Off + 1, 0);
-                PUT(FP2, chr(Rep & 0xff), 1 );
+                c = Rep & 0xff;
+                PUT(FP2, &c, 1);
                 printf("%s - %X:%X\n", Line[Lnum], Off, Rep);
             }
         }
@@ -375,7 +347,8 @@ int main(int argc, char *argv[])
                         if(Off < lof(File1))
                         {
                             fseek(FP2, Off, 0);
-                            PUT(FP2, chr(Rep), 1 );
+                            c = Rep;
+                            PUT(FP2, &c, 1);
                             printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                         }
                         Off +=   8192;
@@ -385,7 +358,8 @@ int main(int argc, char *argv[])
                 else
                 {
                     fseek(FP2, Off, 0);
-                    PUT(FP2, chr(Rep), 1 );
+                    c = Rep;
+                    PUT(FP2, &c, 1);
                     printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                 }
             }
@@ -404,7 +378,8 @@ int main(int argc, char *argv[])
                         if (c == Cmp)
                         {
                             fseek(FP2, Off, 0);
-                            PUT(FP2, chr(Rep), 1 );
+                            c = Rep;
+                            PUT(FP2, &c, 1);
                             printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                         }
                     }
@@ -482,7 +457,8 @@ int main(int argc, char *argv[])
             if(Off < lof(File1))
             {
                 fseek(FP2, Off, 0);
-                PUT(FP2, chr(Rep), 1 );
+                c = Rep;
+                PUT(FP2, &c, 1);
                 printf("%s - %X:%X\n", Line[Lnum], Off, Rep);
             }
         }
