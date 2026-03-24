@@ -423,21 +423,50 @@ int main(int argc, char *argv[])
             Cmp = decoded.cmp;
             Rep = decoded.rep;
 
-            if(lof(File1) % 1024 != 0 )
+            // Whether this ROM has a copier header on it.
+            int romoffset = lof(File1) % 1024 == 0 ? 0 : 512;
+
+            // Detect ROM type.
+            // https://snes.nesdev.org/wiki/ROM_header
+            //   7FD5:   LoROM: 0x20 or 0x30
+            //   FFD5:   HiROM: 0x21 or 0x31
+            // 40FFD5: ExHiROM: 0x25 or 0x35
+            fseek(FP2, 0x7FD5 + romoffset, 0);
+            GET(FP2, &c, 1);
+            if ((c & 0xef) == 0x20)
             {
-                Off +=   512;
+                // LoROM.  Keep the low 15 address bits (A0-A14),
+                // drop the 16th (A15), and shift the rest down by one.
+                // https://snes.nesdev.org/wiki/Memory_map#LoROM
+                printf("SNES LoROM detected\n");
+                Off = (Off & 0x7fff) | ((Off & ~0xffff) >> 1);
             }
-            Num = 65493;
-            if(lof(File1) % 1024 != 0 )
+            else
             {
-                Num +=   512;
+                fseek(FP2, 0xFFD5 + romoffset, 0);
+                GET(FP2, &c, 1);
+                if ((c & 0xef) == 0x21)
+                {
+                    // https://snes.nesdev.org/wiki/Memory_map#HiROM
+                    printf("SNES HiROM detected\n");
+                }
+                else
+                {
+                    fseek(FP2, 0x40FFD5 + romoffset, 0);
+                    GET(FP2, &c, 1);
+                    if ((c & 0xef) == 0x25)
+                    {
+                        // https://snes.nesdev.org/wiki/Memory_map#ExHiROM
+                        printf("SNES ExHiROM detected\n");
+                    }
+                    else
+                    {
+                        printf("Unable to detect SNES ROM type\n");
+                    }
+                }
             }
-            fseek(FP2, Num, 0);
-            GET(FP2, &c, 1 );
-            if (c != 33 && c != 49)
-            {
-                Off = ((Off & 0xff000000) >> 9) | (Off & 0x7fff);
-            }
+
+            Off += romoffset;
             if(Off >= 4194304 && Off <= 8388607 )
             {
                 Off -=   4194304;
