@@ -10,11 +10,9 @@ set -ex
 : "${PKG_CONFIG:=pkg-config}"
 : "${GLIB_LIBS:=$(${PKG_CONFIG} glib-2.0 gio-2.0 --cflags --libs)}"
 ${CC} ${CFLAGS} ${WFLAGS} ${CPPFLAGS} GGGG.c copyfile.c decode.c ${GLIB_LIBS} -o GGGG
-${CXX} ${CXXFLAGS} ${WFLAGS} ${CPPFLAGS} GGGG.cpp copyfile.c decode.c ${GLIB_LIBS} -o GGGG-cpp
 if ${PKG_CONFIG} --exists gtest; then
   ${CXX} ${CXXFLAGS} ${WFLAGS} ${CPPFLAGS} -g unittest.cc copyfile.c decode.c ${GLIB_LIBS} $(${PKG_CONFIG} gtest gtest_main --cflags --libs) -o unittest
 fi
 if command -v i686-w64-mingw32-gcc >/dev/null; then
   i686-w64-mingw32-gcc ${CFLAGS} ${WFLAGS} ${CPPFLAGS} -U_FORTIFY_SOURCE GGGG.c copyfile.c decode.c -o GGGG.exe
-  i686-w64-mingw32-g++ ${CXXFLAGS} ${WFLAGS} ${CPPFLAGS} -U_FORTIFY_SOURCE GGGG.cpp copyfile.c decode.c -o GGGG-cpp.exe
 fi
