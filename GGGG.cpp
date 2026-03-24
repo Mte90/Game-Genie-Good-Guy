@@ -262,13 +262,13 @@ int main(int argc, char *argv[])
         printf("Parsing code: %s\n", Code);
         if(strchr(Code, ':'))
         {
-            if(ext && (strcasecmp(ext, "pce") == 0 || (strcasecmp(ext, "sms") == 0 && lof(File1) % 1024)))
-            {
-                Off +=   512;
-            }
             if (sscanf(Code, "%x:%x", &Off, &Rep) != 2)
             {
                 continue;
+            }
+            if(ext && (strcasecmp(ext, "pce") == 0 || (strcasecmp(ext, "sms") == 0 && lof(File1) % 1024)))
+            {
+                Off +=   512;
             }
             if(Off < lof(File1))
             {
