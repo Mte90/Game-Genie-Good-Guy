@@ -57,10 +57,7 @@ size_t  g_dum1_;  // dummy var for not used returns
 // *************************************************
 
 char* BCX_TmpStr(size_t, size_t , int );
-char*   left (const char*, int);
-char*   right (const char*, int);
 char*   chr(int);
-int     Hex2Dec (const char*);
 off_t   lof (const char*);
 
 // *************************************************
@@ -119,26 +116,6 @@ char *BCX_TmpStr (size_t Bites, size_t  iPad, int iAlloc)
 }
 
 
-char *left (const char *S, int length)
-{
-    int tmplen = strlen(S);
-    if(length < 1) return BCX_TmpStr(1, 0, 1);
-    if(length < tmplen) tmplen = length;
-    char *strtmp = BCX_TmpStr(tmplen, 1, 1);
-    return (char*)memcpy(strtmp, S, tmplen);
-}
-
-
-char *right (const char *S, int length)
-{
-    int tmplen = strlen(S);
-    char *BCX_RetStr = BCX_TmpStr(tmplen, 1, 1);
-    tmplen -= length;
-    if (tmplen < 0) tmplen = 0;
-    return strcpy(BCX_RetStr, &S[tmplen]);
-}
-
-
 char *chr (int a)
 {
     char *strtmp = BCX_TmpStr(2, 1, 1);
@@ -178,14 +155,6 @@ static int split_normalize_codes(char Buf[][cSizeOfDefaultString], char *T)
         *out = '\0';
     } while((token = strtok(NULL, "+\n")) != NULL);
     return count;
-}
-
-
-int Hex2Dec (const char *szInput)
-{
-    int ret = 0;
-    sscanf(szInput, "%x", &ret);
-    return ret;
 }
 
 
@@ -297,8 +266,10 @@ int main(int argc, char *argv[])
             {
                 Off +=   512;
             }
-            Off = Hex2Dec(left( Code, strlen( Code) - 3));
-            Rep = Hex2Dec(right( Code, 2));
+            if (sscanf(Code, "%x:%x", &Off, &Rep) != 2)
+            {
+                continue;
+            }
             if(Off < lof(File1))
             {
                 fseek(FP2, Off, 0);
