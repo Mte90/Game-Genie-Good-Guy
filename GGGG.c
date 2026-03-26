@@ -6,7 +6,9 @@
 //              Translated for compiling with a C Compiler
 //                            On a nix OS
 // *********************************************************************
+#define _POSIX_C_SOURCE 200809L
 #include <ctype.h>      // dos/linux
+#include <errno.h>
 #include <fcntl.h>      // dos/linux
 #include <stdint.h>
 #include <stdio.h>      // dos/linux
@@ -45,7 +47,6 @@ typedef enum
 //            System Defined Constants
 // *************************************************
 
-size_t  g_dum1_;  // dummy var for not used returns
 #define cSizeOfDefaultString 2048
 
 // *************************************************
@@ -56,8 +57,6 @@ size_t  g_dum1_;  // dummy var for not used returns
 // *************************************************
 //               Standard Prototypes
 // *************************************************
-
-off_t   lof (const char*);
 
 // *************************************************
 //                System Variables
@@ -75,8 +74,8 @@ off_t   lof (const char*);
 //               Standard Macros
 // *************************************************
 
-#define GET(A,B,C)g_dum1_= fread(B,1,C,A)
-#define PUT(A,B,C)g_dum1_= fwrite(B,1,C,A)
+// Suppress warn_unused_result warnings.  This is bad practice, but we're lazy.
+#define WUR(x) do { if (x); } while (0)
 
 
 // *************************************************
@@ -92,14 +91,30 @@ off_t   lof (const char*);
 #define streq(a, b) (strcmp(a, b) == 0)
 
 
-off_t lof (const char * FileName)
+#ifdef _WIN32
+
+// These should save/restore offset, but the way these are used in this program,
+// it doesn't matter.
+
+static ssize_t pread(int fd, void *buf, size_t count, off_t offset)
 {
-    int retstat;
+    lseek(fd, offset, 0);
+    return read(fd, buf, count);
+}
+
+static ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset)
+{
+    lseek(fd, offset, 0);
+    return write(fd, buf, count);
+}
+
+#endif
+
+
+static off_t lof(int fd)
+{
     struct stat sb;
-    retstat = stat(FileName, &sb);
-    if(retstat != -1)
-        return sb.st_size;
-    return 0;
+    return fstat(fd, &sb) == 0 ? sb.st_size : 0;
 }
 
 
@@ -169,7 +184,7 @@ int main(int argc, char *argv[])
     int Lnum, Num;
     int Cmp, Off, Rep;
     int Codes;
-    FILE *FP2;
+    int fd;
     unsigned char c;
     static char Line[200][cSizeOfDefaultString];
 
@@ -223,9 +238,9 @@ int main(int argc, char *argv[])
     }
     printf("ROM to patch: %s\n", File1);
     printf("Patch at: %s\n", File2);
-    if((FP2 = fopen(File2, "rb+")) == 0)
+    if ((fd = open(File2, O_RDWR)) < 0)
     {
-        fprintf(stderr, "%s: Can't open file %s\n", argv[0], File2);
+        fprintf(stderr, "%s: Can't open file %s: %s\n", argv[0], File2, strerror(errno));
         exit(1);
     }
     printf("\nLog:\n");
@@ -245,15 +260,14 @@ int main(int argc, char *argv[])
             Cmp = decoded.cmp;
             Rep = decoded.rep;
 
-            if(ext && (strcasecmp(ext, "pce") == 0 || (strcasecmp(ext, "sms") == 0 && lof(File1) % 1024)))
+            if(ext && (strcasecmp(ext, "pce") == 0 || (strcasecmp(ext, "sms") == 0 && lof(fd) % 1024)))
             {
                 Off +=   512;
             }
-            if(Off < lof(File1))
+            if(Off < lof(fd))
             {
-                fseek(FP2, Off, 0);
                 c = Rep;
-                PUT(FP2, &c, 1);
+                WUR(pwrite(fd, &c, 1, Off));
                 printf("%s\n", Line[Lnum]);
             }
         }
@@ -269,13 +283,12 @@ int main(int argc, char *argv[])
 
             if(decoded.len == 6)
             {
-                for(Num = 0; Num <= lof(File1) / 8192; Num += 1)
+                for(Num = 0; Num <= lof(fd) / 8192; Num += 1)
                 {
-                    if(Off < lof(File1))
+                    if(Off < lof(fd))
                     {
-                        fseek(FP2, Off, 0);
                         c = Rep;
-                        PUT(FP2, &c, 1);
+                        WUR(pwrite(fd, &c, 1, Off));
                         printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                     }
                     Off +=   8192;
@@ -284,17 +297,15 @@ int main(int argc, char *argv[])
             }
             if(decoded.len == 9)
             {
-                for(Num = 0; Num <= lof(File1) / 8192; Num += 1)
+                for(Num = 0; Num <= lof(fd) / 8192; Num += 1)
                 {
-                    if(Off < lof(File1))
+                    if(Off < lof(fd))
                     {
-                        fseek(FP2, Off, 0);
-                        GET(FP2, &c, 1 );
+                        WUR(pread(fd, &c, 1, Off));
                         if (c == Cmp)
                         {
-                            fseek(FP2, Off, 0);
                             c = Rep;
-                            PUT(FP2, &c, 1);
+                            WUR(pwrite(fd, &c, 1, Off));
                             printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                         }
                     }
@@ -313,14 +324,12 @@ int main(int argc, char *argv[])
             Cmp = decoded.cmp;
             Rep = decoded.rep;
 
-            if(Off < lof(File1))
+            if(Off < lof(fd))
             {
-                fseek(FP2, Off, 0);
                 c = Rep >> 8;
-                PUT(FP2, &c, 1);
-                fseek(FP2, Off + 1, 0);
+                WUR(pwrite(fd, &c, 1, Off));
                 c = Rep & 0xff;
-                PUT(FP2, &c, 1);
+                WUR(pwrite(fd, &c, 1, Off));
                 printf("%s - %X:%X\n", Line[Lnum], Off, Rep);
             }
         }
@@ -336,19 +345,18 @@ int main(int argc, char *argv[])
 
             if(decoded.len == 6)
             {
-                if(lof(File1) % 1024 != 0 )
+                if(lof(fd) % 1024 != 0 )
                 {
                     Off +=   16;
                 }
-                if(lof(File1) >= 49169 )
+                if(lof(fd) >= 49169 )
                 {
-                    for(Num = 0; Num <= lof(File1) / 8192; Num += 1)
+                    for(Num = 0; Num <= lof(fd) / 8192; Num += 1)
                     {
-                        if(Off < lof(File1))
+                        if(Off < lof(fd))
                         {
-                            fseek(FP2, Off, 0);
                             c = Rep;
-                            PUT(FP2, &c, 1);
+                            WUR(pwrite(fd, &c, 1, Off));
                             printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                         }
                         Off +=   8192;
@@ -357,29 +365,26 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    fseek(FP2, Off, 0);
                     c = Rep;
-                    PUT(FP2, &c, 1);
+                    WUR(pwrite(fd, &c, 1, Off));
                     printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                 }
             }
             if(decoded.len == 8)
             {
-                if(lof(File1) % 1024 != 0 )
+                if(lof(fd) % 1024 != 0 )
                 {
                     Off +=   16;
                 }
-                for(Num = 0; Num <= lof(File1) / 8192; Num += 1)
+                for(Num = 0; Num <= lof(fd) / 8192; Num += 1)
                 {
-                    if(Off < lof(File1))
+                    if(Off < lof(fd))
                     {
-                        fseek(FP2, Off, 0);
-                        GET(FP2, &c, 1);
+                        WUR(pread(fd, &c, 1, Off));
                         if (c == Cmp)
                         {
-                            fseek(FP2, Off, 0);
                             c = Rep;
-                            PUT(FP2, &c, 1);
+                            WUR(pwrite(fd, &c, 1, Off));
                             printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
                         }
                     }
@@ -399,15 +404,14 @@ int main(int argc, char *argv[])
             Rep = decoded.rep;
 
             // Whether this ROM has a copier header on it.
-            int romoffset = lof(File1) % 1024 == 0 ? 0 : 512;
+            int romoffset = lof(fd) % 1024 == 0 ? 0 : 512;
 
             // Detect ROM type.
             // https://snes.nesdev.org/wiki/ROM_header
             //   7FD5:   LoROM: 0x20 or 0x30
             //   FFD5:   HiROM: 0x21 or 0x31
             // 40FFD5: ExHiROM: 0x25 or 0x35
-            fseek(FP2, 0x7FD5 + romoffset, 0);
-            GET(FP2, &c, 1);
+            WUR(pread(fd, &c, 1, 0x7FD5 + romoffset));
             if ((c & 0xef) == 0x20)
             {
                 // LoROM.  Keep the low 15 address bits (A0-A14),
@@ -418,8 +422,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                fseek(FP2, 0xFFD5 + romoffset, 0);
-                GET(FP2, &c, 1);
+                WUR(pread(fd, &c, 1, 0xFFD5 + romoffset));
                 if ((c & 0xef) == 0x21)
                 {
                     // https://snes.nesdev.org/wiki/Memory_map#HiROM
@@ -427,8 +430,7 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    fseek(FP2, 0x40FFD5 + romoffset, 0);
-                    GET(FP2, &c, 1);
+                    WUR(pread(fd, &c, 1, 0x40FFD5 + romoffset));
                     if ((c & 0xef) == 0x25)
                     {
                         // https://snes.nesdev.org/wiki/Memory_map#ExHiROM
@@ -454,20 +456,15 @@ int main(int argc, char *argv[])
             {
                 Off -=   12582912;
             }
-            if(Off < lof(File1))
+            if(Off < lof(fd))
             {
-                fseek(FP2, Off, 0);
                 c = Rep;
-                PUT(FP2, &c, 1);
+                WUR(pwrite(fd, &c, 1, Off));
                 printf("%s - %X:%X\n", Line[Lnum], Off, Rep);
             }
         }
     }
 
-    if(FP2)
-    {
-        fclose(FP2);
-        FP2 = NULL;
-    }
+    close(fd);
     return 0;   /* End of main program */
 }
