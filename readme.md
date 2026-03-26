@@ -25,8 +25,15 @@ The idea of the new project is to get that tool (or the patching engine) running
 * Understand how that [BCX-BASIC language](https://www.bcxbasiccoders.com/webhelp/BCXHelp.htm) works to patch [the original code](https://github.com/Mte90/Game-Genie-Good-Guy/blob/1.0.0/original/GGGuy.bas)
 * Rewrite the [BASIC code](https://github.com/Mte90/Game-Genie-Good-Guy/blob/1.0.0/GGGG.bas) to get cli support
 * Some code optimizations in the BASIC version
-* Patch manually [C/C++ code for compilers issues](https://github.com/Mte90/Game-Genie-Good-Guy/blob/master/generate.sh)
-* Create a [GUI with IPS patch generator](https://github.com/Mte90/Game-Genie-Good-Guy/tree/master/gui)
+* Patch manually [C/C++ code for compilers issues](https://github.com/Mte90/Game-Genie-Good-Guy/blob/1.0.0/generate.sh)
+* Create a [GUI with IPS patch generator](./gui/)
+
+## Compile C version
+
+This will build the main C program for Linux, as well as the unittests &
+Windows version if additional packages are available.
+
+    ./compile.sh
 
 # Parameters
 
@@ -51,16 +58,6 @@ Multiple cheat code can be concatenated with `+` or new lines.
     ./gui/app.py
 
 Open the UI version.
-
-## Compile both versions
-
-    ./compile.sh
-
-This script will patch the C code for the various errors on converting it.
-
-### Convert new BASIC version to C/C++
-
-    ./generate.sh
 
 ### Check if the roms are different
 
