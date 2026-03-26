@@ -185,6 +185,7 @@ int main(int argc, char *argv[])
     int Cmp, Off, Rep;
     int Codes;
     int fd;
+    off_t filelen;
     unsigned char c;
     static char Line[200][cSizeOfDefaultString];
 
@@ -243,6 +244,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "%s: Can't open file %s: %s\n", argv[0], File2, strerror(errno));
         exit(1);
     }
+    filelen = lof(fd);
     printf("\nLog:\n");
     for(Lnum = 0; Lnum < Codes; Lnum += 1)
     {
@@ -260,11 +262,11 @@ int main(int argc, char *argv[])
             Cmp = decoded.cmp;
             Rep = decoded.rep;
 
-            if(ext && (strcasecmp(ext, "pce") == 0 || (strcasecmp(ext, "sms") == 0 && lof(fd) % 1024)))
+            if(ext && (strcasecmp(ext, "pce") == 0 || (strcasecmp(ext, "sms") == 0 && filelen % 1024)))
             {
                 Off +=   512;
             }
-            if(Off < lof(fd))
+            if(Off < filelen)
             {
                 c = Rep;
                 WUR(pwrite(fd, &c, 1, Off));
@@ -283,9 +285,9 @@ int main(int argc, char *argv[])
 
             if(decoded.len == 6)
             {
-                for(Num = 0; Num <= lof(fd) / 8192; Num += 1)
+                for(Num = 0; Num <= filelen / 8192; Num += 1)
                 {
-                    if(Off < lof(fd))
+                    if(Off < filelen)
                     {
                         c = Rep;
                         WUR(pwrite(fd, &c, 1, Off));
@@ -297,9 +299,9 @@ int main(int argc, char *argv[])
             }
             if(decoded.len == 9)
             {
-                for(Num = 0; Num <= lof(fd) / 8192; Num += 1)
+                for(Num = 0; Num <= filelen / 8192; Num += 1)
                 {
-                    if(Off < lof(fd))
+                    if(Off < filelen)
                     {
                         WUR(pread(fd, &c, 1, Off));
                         if (c == Cmp)
@@ -324,7 +326,7 @@ int main(int argc, char *argv[])
             Cmp = decoded.cmp;
             Rep = decoded.rep;
 
-            if(Off < lof(fd))
+            if(Off < filelen)
             {
                 c = Rep >> 8;
                 WUR(pwrite(fd, &c, 1, Off));
@@ -345,15 +347,15 @@ int main(int argc, char *argv[])
 
             if(decoded.len == 6)
             {
-                if(lof(fd) % 1024 != 0 )
+                if(filelen % 1024 != 0 )
                 {
                     Off +=   16;
                 }
-                if(lof(fd) >= 49169 )
+                if(filelen >= 49169 )
                 {
-                    for(Num = 0; Num <= lof(fd) / 8192; Num += 1)
+                    for(Num = 0; Num <= filelen / 8192; Num += 1)
                     {
-                        if(Off < lof(fd))
+                        if(Off < filelen)
                         {
                             c = Rep;
                             WUR(pwrite(fd, &c, 1, Off));
@@ -372,13 +374,13 @@ int main(int argc, char *argv[])
             }
             if(decoded.len == 8)
             {
-                if(lof(fd) % 1024 != 0 )
+                if(filelen % 1024 != 0 )
                 {
                     Off +=   16;
                 }
-                for(Num = 0; Num <= lof(fd) / 8192; Num += 1)
+                for(Num = 0; Num <= filelen / 8192; Num += 1)
                 {
-                    if(Off < lof(fd))
+                    if(Off < filelen)
                     {
                         WUR(pread(fd, &c, 1, Off));
                         if (c == Cmp)
@@ -404,7 +406,7 @@ int main(int argc, char *argv[])
             Rep = decoded.rep;
 
             // Whether this ROM has a copier header on it.
-            int romoffset = lof(fd) % 1024 == 0 ? 0 : 512;
+            int romoffset = filelen % 1024 == 0 ? 0 : 512;
 
             // Detect ROM type.
             // https://snes.nesdev.org/wiki/ROM_header
@@ -456,7 +458,7 @@ int main(int argc, char *argv[])
             {
                 Off -=   12582912;
             }
-            if(Off < lof(fd))
+            if(Off < filelen)
             {
                 c = Rep;
                 WUR(pwrite(fd, &c, 1, Off));
