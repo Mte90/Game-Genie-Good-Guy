@@ -1,9 +1,15 @@
+#if !defined(_WIN32) && !defined(__wasm__)
+# define USE_GLIB 1
+#else
+# define USE_GLIB 0
+#endif
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef _WIN32
+#if USE_GLIB
 #include <glib.h>
 #include <gio/gio.h>
 #include <glib/gstdio.h>
@@ -13,7 +19,7 @@
 
 bool gCopyFile(const char* source, const char* dest, bool overwrite)
 {
-#ifdef _WIN32
+#if !USE_GLIB
     FILE *fpsrc, *fpdst;
     char *buf = (char*)malloc(1024 * 1024);
     size_t nread, nwrite;
