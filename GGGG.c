@@ -6,32 +6,20 @@
 //              Translated for compiling with a C Compiler
 //                            On a nix OS
 // *********************************************************************
-#define _POSIX_C_SOURCE 200809L
 #include <ctype.h>      // dos/linux
 #include <errno.h>
 #include <fcntl.h>      // dos/linux
 #include <stdint.h>
 #include <stdio.h>      // dos/linux
 #include <string.h>     // dos/linux
-#include <strings.h>
 #include <stddef.h>     // dos/linux
 #include <stdlib.h>     // dos/linux
-#include <stdarg.h>     // dos/linux
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <stdbool.h>    // linux only
 #include <unistd.h>     // linux only
 
 #include "copyfile.h"
 #include "decode.h"
-
-// ***************************************************
-// Compiler Defines
-// ***************************************************
-
-// *************************************************
-//        User's GLOBAL ENUM blocks
-// *************************************************
+#include "modify.h"
 
 typedef enum
 {
@@ -43,79 +31,9 @@ typedef enum
     GG_TYPE_SNES,
 } gg_type;
 
-// *************************************************
-//            System Defined Constants
-// *************************************************
-
 #define cSizeOfDefaultString 2048
 
-// *************************************************
-//            User Defined Constants
-// *************************************************
-
-
-// *************************************************
-//               Standard Prototypes
-// *************************************************
-
-// *************************************************
-//                System Variables
-// *************************************************
-
-// *************************************************
-//          User Defined Types And Unions
-// *************************************************
-
-// *************************************************
-//            User Global Variables
-// *************************************************
-
-// *************************************************
-//               Standard Macros
-// *************************************************
-
-// Suppress warn_unused_result warnings.  This is bad practice, but we're lazy.
-#define WUR(x) do { if (x); } while (0)
-
-
-// *************************************************
-//            User Global Initialized Arrays
-// *************************************************
-
-
-
-// *************************************************
-//                 Runtime Functions
-// *************************************************
-
 #define streq(a, b) (strcmp(a, b) == 0)
-
-
-#ifdef _WIN32
-
-// These should save/restore offset, but the way these are used in this program,
-// it doesn't matter.
-
-static ssize_t pread(int fd, void *buf, size_t count, off_t offset)
-{
-    lseek(fd, offset, 0);
-    return read(fd, buf, count);
-}
-
-static ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset)
-{
-    lseek(fd, offset, 0);
-    return write(fd, buf, count);
-}
-
-#endif
-
-
-static off_t lof(int fd)
-{
-    struct stat sb;
-    return fstat(fd, &sb) == 0 ? sb.st_size : 0;
-}
 
 
 static int split_normalize_codes(char Buf[][cSizeOfDefaultString], char *T)
@@ -140,10 +58,6 @@ static int split_normalize_codes(char Buf[][cSizeOfDefaultString], char *T)
     return count;
 }
 
-
-// ************************************
-//       User Subs and Functions
-// ************************************
 
 static gg_type parse_gg_type(const char *type)
 {
@@ -175,18 +89,12 @@ static gg_type parse_gg_type(const char *type)
     return GG_TYPE_UNKNOWN;
 }
 
-// *************************************************
-//                  Main Program
-// *************************************************
 
 int main(int argc, char *argv[])
 {
-    int Lnum, Num;
-    int Cmp, Off, Rep;
+    int Lnum;
     int Codes;
     int fd;
-    off_t filelen;
-    unsigned char c;
     static char Line[200][cSizeOfDefaultString];
 
     if(argc != 5)
@@ -244,7 +152,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "%s: Can't open file %s: %s\n", argv[0], File2, strerror(errno));
         exit(1);
     }
-    filelen = lof(fd);
     printf("\nLog:\n");
     for(Lnum = 0; Lnum < Codes; Lnum += 1)
     {
@@ -258,19 +165,11 @@ int main(int argc, char *argv[])
             {
                 continue;
             }
-            Off = decoded.off;
-            Cmp = decoded.cmp;
-            Rep = decoded.rep;
-
-            if(ext && (strcasecmp(ext, "pce") == 0 || (strcasecmp(ext, "sms") == 0 && filelen % 1024)))
+            printf("%s - %X:%X\n", Line[Lnum], decoded.off, decoded.rep);
+            if (!modifyRaw(fd, ext, &decoded))
             {
-                Off +=   512;
-            }
-            if(Off < filelen)
-            {
-                c = Rep;
-                WUR(pwrite(fd, &c, 1, Off));
-                printf("%s\n", Line[Lnum]);
+                fprintf(stderr, "%s: ERROR: unable to apply code\n", argv[0]);
+                continue;
             }
         }
         if (Type == GG_TYPE_GBGGMS)
@@ -279,41 +178,11 @@ int main(int argc, char *argv[])
             {
                 continue;
             }
-            Off = decoded.off;
-            Cmp = decoded.cmp;
-            Rep = decoded.rep;
-
-            if(decoded.len == 6)
+            printf("%s - %X:%X\n", Line[Lnum], decoded.off, decoded.rep);
+            if (!modifyGbGgMs(fd, &decoded))
             {
-                for(Num = 0; Num <= filelen / 8192; Num += 1)
-                {
-                    if(Off < filelen)
-                    {
-                        c = Rep;
-                        WUR(pwrite(fd, &c, 1, Off));
-                        printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
-                    }
-                    Off +=   8192;
-                }
-
-            }
-            if(decoded.len == 9)
-            {
-                for(Num = 0; Num <= filelen / 8192; Num += 1)
-                {
-                    if(Off < filelen)
-                    {
-                        WUR(pread(fd, &c, 1, Off));
-                        if (c == Cmp)
-                        {
-                            c = Rep;
-                            WUR(pwrite(fd, &c, 1, Off));
-                            printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
-                        }
-                    }
-                    Off +=   8192;
-                }
-
+                fprintf(stderr, "%s: ERROR: unable to apply code\n", argv[0]);
+                continue;
             }
         }
         if (Type == GG_TYPE_GENESIS)
@@ -322,17 +191,11 @@ int main(int argc, char *argv[])
             {
                 continue;
             }
-            Off = decoded.off;
-            Cmp = decoded.cmp;
-            Rep = decoded.rep;
-
-            if(Off < filelen)
+            printf("%s - %X:%X\n", Line[Lnum], decoded.off, decoded.rep);
+            if (!modifyGenesis(fd, &decoded))
             {
-                c = Rep >> 8;
-                WUR(pwrite(fd, &c, 1, Off));
-                c = Rep & 0xff;
-                WUR(pwrite(fd, &c, 1, Off));
-                printf("%s - %X:%X\n", Line[Lnum], Off, Rep);
+                fprintf(stderr, "%s: ERROR: unable to apply code\n", argv[0]);
+                continue;
             }
         }
         if (Type == GG_TYPE_NES)
@@ -341,58 +204,11 @@ int main(int argc, char *argv[])
             {
                 continue;
             }
-            Off = decoded.off + 0x8000 - 0xc000;
-            Cmp = decoded.cmp;
-            Rep = decoded.rep;
-
-            if(decoded.len == 6)
+            printf("%s - %X:%X:%X\n", Line[Lnum], decoded.off, decoded.cmp, decoded.rep);
+            if (!modifyNES(fd, &decoded))
             {
-                if(filelen % 1024 != 0 )
-                {
-                    Off +=   16;
-                }
-                if(filelen >= 49169 )
-                {
-                    for(Num = 0; Num <= filelen / 8192; Num += 1)
-                    {
-                        if(Off < filelen)
-                        {
-                            c = Rep;
-                            WUR(pwrite(fd, &c, 1, Off));
-                            printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
-                        }
-                        Off +=   8192;
-                    }
-
-                }
-                else
-                {
-                    c = Rep;
-                    WUR(pwrite(fd, &c, 1, Off));
-                    printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
-                }
-            }
-            if(decoded.len == 8)
-            {
-                if(filelen % 1024 != 0 )
-                {
-                    Off +=   16;
-                }
-                for(Num = 0; Num <= filelen / 8192; Num += 1)
-                {
-                    if(Off < filelen)
-                    {
-                        WUR(pread(fd, &c, 1, Off));
-                        if (c == Cmp)
-                        {
-                            c = Rep;
-                            WUR(pwrite(fd, &c, 1, Off));
-                            printf("%s - %X:%X:%X\n", Line[Lnum], Off, Cmp, Rep);
-                        }
-                    }
-                    Off +=   8192;
-                }
-
+                fprintf(stderr, "%s: ERROR: unable to apply code\n", argv[0]);
+                continue;
             }
         }
         if (Type == GG_TYPE_SNES)
@@ -401,68 +217,11 @@ int main(int argc, char *argv[])
             {
                 continue;
             }
-            Off = decoded.off;
-            Cmp = decoded.cmp;
-            Rep = decoded.rep;
-
-            // Whether this ROM has a copier header on it.
-            int romoffset = filelen % 1024 == 0 ? 0 : 512;
-
-            // Detect ROM type.
-            // https://snes.nesdev.org/wiki/ROM_header
-            //   7FD5:   LoROM: 0x20 or 0x30
-            //   FFD5:   HiROM: 0x21 or 0x31
-            // 40FFD5: ExHiROM: 0x25 or 0x35
-            WUR(pread(fd, &c, 1, 0x7FD5 + romoffset));
-            if ((c & 0xef) == 0x20)
+            printf("%s - %X:%X\n", Line[Lnum], decoded.off, decoded.rep);
+            if (!modifySNES(fd, &decoded))
             {
-                // LoROM.  Keep the low 15 address bits (A0-A14),
-                // drop the 16th (A15), and shift the rest down by one.
-                // https://snes.nesdev.org/wiki/Memory_map#LoROM
-                printf("SNES LoROM detected\n");
-                Off = (Off & 0x7fff) | ((Off & ~0xffff) >> 1);
-            }
-            else
-            {
-                WUR(pread(fd, &c, 1, 0xFFD5 + romoffset));
-                if ((c & 0xef) == 0x21)
-                {
-                    // https://snes.nesdev.org/wiki/Memory_map#HiROM
-                    printf("SNES HiROM detected\n");
-                }
-                else
-                {
-                    WUR(pread(fd, &c, 1, 0x40FFD5 + romoffset));
-                    if ((c & 0xef) == 0x25)
-                    {
-                        // https://snes.nesdev.org/wiki/Memory_map#ExHiROM
-                        printf("SNES ExHiROM detected\n");
-                    }
-                    else
-                    {
-                        printf("Unable to detect SNES ROM type\n");
-                    }
-                }
-            }
-
-            Off += romoffset;
-            if(Off >= 4194304 && Off <= 8388607 )
-            {
-                Off -=   4194304;
-            }
-            if(Off >= 8388608 && Off <= 12582911 )
-            {
-                Off -=   8388608;
-            }
-            if(Off >= 12582912 && Off <= 16777215 )
-            {
-                Off -=   12582912;
-            }
-            if(Off < filelen)
-            {
-                c = Rep;
-                WUR(pwrite(fd, &c, 1, Off));
-                printf("%s - %X:%X\n", Line[Lnum], Off, Rep);
+                fprintf(stderr, "%s: ERROR: unable to apply code\n", argv[0]);
+                continue;
             }
         }
     }

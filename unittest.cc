@@ -1,16 +1,22 @@
 // Unittests for GGGG.
 
+#define _POSIX_C_SOURCE 200809L
+
 #include <filesystem>
 #include <string>
 #include <vector>
 
 #include <assert.h>
+#include <fcntl.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/mman.h>
 
 #include <gtest/gtest.h>
 
 #include "copyfile.h"
 #include "decode.h"
+#include "modify.h"
 
 namespace fs = std::filesystem;
 
@@ -50,6 +56,54 @@ TEST_F(TempDirTest, CopyFile) {
   ASSERT_EQ(unlink(dst.c_str()), 0);
   ASSERT_EQ(gCopyFile(src.c_str(), dst.c_str(), true), true);
   ASSERT_EQ(fs::file_size(dst), 100);
+}
+
+class ModifyRomTest : public TempDirTest {
+ protected:
+  int getSnesLoRom(bool header = true) {
+    // Get a tempfile of the correct length.
+    auto rom = getTmpFile();
+    int pad = header ? 512 : 0;
+    size_t len = 0x100000 + pad;
+    fs::resize_file(rom, len);
+    int fd = open(rom.c_str(), O_RDWR);
+    if (fd < 0)
+      return -1;
+
+    // Fill the file with non-zero data.
+    void *map = mmap(nullptr, len, PROT_WRITE, MAP_SHARED, fd, 0);
+    if (map == nullptr)
+      return -1;
+    memset(map, 0xaa, len);
+    munmap(map, len);
+
+    // Write the LoROM header.  For now we write enough for our code,
+    // but this probably should be a bit more complete.
+    char c = 0x30;
+    if (pwrite(fd, &c, 1, 0x7FD5 + pad) != 1)
+      return -1;
+
+    return fd;
+  }
+};
+
+TEST_F(ModifyRomTest, SNES) {
+  struct codebits decoded;
+  int fd = getSnesLoRom();
+  ASSERT_GE(fd, 0);
+  char c;
+
+  // Apply code and verify the rom data is now 0.
+  ASSERT_TRUE(decodeSNES("DDA7AD65", &decoded));
+  ASSERT_TRUE(modifySNES(fd, &decoded));
+  ASSERT_EQ(pread(fd, &c, 1, 0xD132), 1);
+  ASSERT_EQ(c, 0);
+
+  // Apply code and verify the rom data is now 0.
+  ASSERT_TRUE(decodeSNES("DD350761", &decoded));
+  ASSERT_TRUE(modifySNES(fd, &decoded));
+  ASSERT_EQ(pread(fd, &c, 1, 0xEB7E), 1);
+  ASSERT_EQ(c, 0);
 }
 
 }
