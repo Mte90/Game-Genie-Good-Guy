@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Genie Good Guy Web</title>
+    <script type="module" src="GGGG.js"></script>
+    <link rel="stylesheet" href="GGGG.css" />
+  </head>
+
+  <body>
+    <h1 align="center">Game Genie Good Guy Web</h1>
+
+    <table align="center">
+      <tr>
+        <td>ROM:</td>
+        <td><input id="input" type="file" /></td>
+      </tr>
+
+      <tr>
+        <td>System:</td>
+        <td>
+          <select id="system">
+            <option value="0">Raw</option>
+            <option value="1">Game Boy/Gear/Master System</option>
+            <option value="2">Genesis/Mega Drive (no SMD roms)</option>
+            <option value="3">Nintendo</option>
+            <option value="4" selected>Super Nintendo</option>
+          </select>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Codes:</td>
+        <td>
+          <textarea id="codes" cols="30"></textarea>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Lists:</td>
+        <td>
+          <a
+            rel="noreferrer"
+            href="https://drive.google.com/file/d/1MAglWiHliz4AnoABc6aWK2p0NDX0FCtF/preview"
+            >nesworld.com</a
+          >
+          <a rel="noreferrer" href="https://gamegenie.com/cheats/">gamegenie.com</a>
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="2" align="center">
+          <input id="run" type="button" value="Generate patched ROM" />
+          <a id="download"></a>
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="2" align="center">
+          Log<br />
+          <textarea id="log" cols="40" rows="20"></textarea>
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="2" align="center">
+          JS Console Debugging: <input id="debug" type="checkbox" />
+        </td>
+      </tr>
+
+      <tr>
+        <td>Bug reports:</td>
+        <td>
+          <a rel="noreferrer" href="https://github.com/Mte90/Game-Genie-Good-Guy/issues"
+            >GitHub issues</a
+          >
+        </td>
+      </tr>
+
+      <tr>
+        <td>Source:</td>
+        <td>
+          <a rel="noreferrer" href="https://github.com/Mte90/Game-Genie-Good-Guy/">[program]</a>
+          <a rel="noreferrer" href="https://github.com/Mte90/Game-Genie-Good-Guy/tree/gh-pages"
+            >[web]</a
+          >
+        </td>
+      </tr>
+
+      <tr>
+        <td>License:</td>
+        <td>
+          <a rel="noreferrer" href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPL-3</a>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Credits:</td>
+        <td>
+          Daniele Scasciafratte &lt;<a href="https://github.com/Mte90/">mte90@</a>&gt;<br />
+          Mike Frysinger &lt;<a href="https://github.com/vapier/">vapier@</a>&gt;
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

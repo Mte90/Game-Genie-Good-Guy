@@ -1,0 +1,15 @@
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #303030;
+    color: #efefef;
+  }
+  input {
+    background-color: #bbb;
+  }
+  textarea {
+    background-color: #bbb;
+  }
+  a {
+    color: #ffff11;
+  }
+}
