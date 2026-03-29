@@ -21,8 +21,7 @@ const FD_STDIN = 0;
 const FD_STDOUT = 1;
 const FD_STDERR = 2;
 const FD_CWD = 3;
-const FD_INPUT = 4;
-const FD_OUTPUT = 5;
+const FD_ROM = 4;
 
 /**
  * Syscall handler that glues the JS/DOM world to the WASM world.
@@ -45,8 +44,8 @@ class GgggSyscallHandler extends SyscallHandler.DirectWasiPreview1 {
         this.log.value += this.td.decode(buf, { stream: true });
         return { nwritten: buf.length };
 
-      case FD_OUTPUT: {
-        outputRomBuffer.set(buf, this.outputOffset);
+      case FD_ROM: {
+        romBuffer.set(buf, this.outputOffset);
         this.outputOffset += buf.length;
         return { nwritten: buf.length };
       }
@@ -58,8 +57,8 @@ class GgggSyscallHandler extends SyscallHandler.DirectWasiPreview1 {
   // Write data to a file descriptor with specific offset.
   handle_fd_pwrite(fd, buf, offset) {
     switch (fd) {
-      case FD_OUTPUT: {
-        outputRomBuffer.set(buf, Number(offset));
+      case FD_ROM: {
+        romBuffer.set(buf, Number(offset));
         return { nwritten: buf.length };
       }
     }
@@ -106,12 +105,7 @@ class GgggSyscallHandler extends SyscallHandler.DirectWasiPreview1 {
           ...ret,
           fs_filetype: WASI.filetype.DIRECTORY,
         };
-      case FD_INPUT:
-        return {
-          ...ret,
-          fs_filetype: WASI.filetype.REGULAR_FILE,
-        };
-      case FD_OUTPUT:
+      case FD_ROM:
         return {
           ...ret,
           fs_filetype: WASI.filetype.REGULAR_FILE,
@@ -133,17 +127,11 @@ class GgggSyscallHandler extends SyscallHandler.DirectWasiPreview1 {
       ctim: 0n,
     };
     switch (fd) {
-      case FD_INPUT:
+      case FD_ROM:
         return {
           ...ret,
           filetype: WASI.filetype.REGULAR_FILE,
-          size: BigInt(inputRomBuffer.length),
-        };
-      case FD_OUTPUT:
-        return {
-          ...ret,
-          filetype: WASI.filetype.REGULAR_FILE,
-          size: BigInt(outputRomBuffer.length),
+          size: BigInt(romBuffer.length),
         };
     }
     return WASI.errno.EBADF;
@@ -162,10 +150,8 @@ class GgggSyscallHandler extends SyscallHandler.DirectWasiPreview1 {
     if (dirfd === FD_CWD) {
       switch (path) {
         case inputRom.name: {
-          return { fd: FD_INPUT };
+          return { fd: FD_ROM };
         }
-        case "output.rom":
-          return { fd: FD_OUTPUT };
       }
     }
     return WASI.errno.ENOENT;
@@ -174,8 +160,8 @@ class GgggSyscallHandler extends SyscallHandler.DirectWasiPreview1 {
   // Read data from a file descriptor.
   handle_fd_read(fd, length) {
     switch (fd) {
-      case FD_INPUT: {
-        const slice = inputRomBuffer.slice(
+      case FD_ROM: {
+        const slice = romBuffer.slice(
           this.inputOffset,
           this.inputOffset + length,
         );
@@ -185,8 +171,6 @@ class GgggSyscallHandler extends SyscallHandler.DirectWasiPreview1 {
           buf: slice,
         };
       }
-      case FD_OUTPUT:
-        break;
     }
     return WASI.errno.EBADF;
   }
@@ -194,10 +178,9 @@ class GgggSyscallHandler extends SyscallHandler.DirectWasiPreview1 {
   // Read data from a file descriptor with specific offset.
   handle_fd_pread(fd, length, offset) {
     switch (fd) {
-      case FD_INPUT:
-      case FD_OUTPUT: {
+      case FD_ROM: {
         offset = Number(offset);
-        const slice = inputRomBuffer.slice(offset, offset + length);
+        const slice = romBuffer.slice(offset, offset + length);
         return {
           nread: slice.length,
           buf: slice,
@@ -246,8 +229,7 @@ async function runGgggMain() {
   globalThis.inputRom = input.files[0];
   const iblob = new Blob([inputRom], { type: "application/octet-stream" });
   const buf = await iblob.arrayBuffer();
-  globalThis.inputRomBuffer = new Uint8Array(buf);
-  globalThis.outputRomBuffer = new Uint8Array(buf.byteLength);
+  globalThis.romBuffer = new Uint8Array(buf);
 
   // Get the user settings to run GGGG.
   const codes = document.getElementById("codes").value;
@@ -256,7 +238,7 @@ async function runGgggMain() {
   const debug = document.getElementById("debug").checked;
   const ret = await run(
     GGGGwasm,
-    [codes, system, inputRom.name, "output.rom"],
+    ["-i", codes, system, inputRom.name],
     debug,
   );
   log.value += `GGGG.wasm exited ${ret}\n\n`;
@@ -264,7 +246,7 @@ async function runGgggMain() {
   // Save the output ROM.
   if (ret === 0) {
     const download = document.getElementById("download");
-    const oblob = new Blob([outputRomBuffer]);
+    const oblob = new Blob([romBuffer]);
     download.download = inputRom.name + ".gggg";
     download.href = URL.createObjectURL(oblob);
     download.click();
