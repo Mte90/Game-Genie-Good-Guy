@@ -9,6 +9,8 @@
 *.nes
 *.smc
 
+/wasi-sdk-*
+
 UbxBasic 
 GGGG
 /unittest
