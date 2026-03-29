@@ -21,6 +21,8 @@
 #include "decode.h"
 #include "modify.h"
 
+#define VERSION "2.0"
+
 typedef enum
 {
     GG_TYPE_UNKNOWN = -1,
@@ -90,55 +92,96 @@ static gg_type parse_gg_type(const char *type)
 }
 
 
+static void usage(bool error)
+{
+    fprintf(
+        error ? stderr : stdout,
+        "Usage: GGGG [options] <code> <type> <input> [output]\n"
+        "\n"
+        "Options:\n"
+        "  -i   Update <input> inplace, otherwise write to <output>\n"
+        "  -V   Show version information\n"
+        "\n"
+        "Game Genie Code:\n"
+        "  0: <offset>:<value> (both in hex, value is 8-bit)\n"
+        "  1: XXX-XXX or XXX-XXX-XXX\n"
+        "  2: XXXX-XXXX\n"
+        "  3: XXXXXX or XXXXXXXX\n"
+        "  4: XXXX-XXXX\n"
+        "\n"
+        "System Type:\n"
+        "  0: Raw dump\n"
+        "  1: Game Boy/Game Gear/Master System\n"
+        "  2: Genesis/Mega Drive\n"
+        "  3: Nintendo\n"
+        "  4: Super Nintendo\n"
+        "\n"
+        "Input: A valid ROM file for the <type> system.\n"
+        "Output: The file will be removed and patched.\n");
+}
+
+
 int main(int argc, char *argv[])
 {
     int Lnum;
     int Codes;
     int fd;
+    int o;
+    bool inplace = false;
+    const char *program = argv[0];
     static char Line[200][cSizeOfDefaultString];
 
-    if(argc != 5)
+    while ((o = getopt(argc, argv, "hiV")) != -1)
     {
-        fprintf(
-            stderr,
-            "Usage: GGGG <code> <type> <input> <output>\n"
-            "\n"
-            "Game Genie Code:\n"
-            "  0: <offset>:<value> (both in hex, value is 8-bit)\n"
-            "  1: XXX-XXX or XXX-XXX-XXX\n"
-            "  2: XXXX-XXXX\n"
-            "  3: XXXXXX or XXXXXXXX\n"
-            "  4: XXXX-XXXX\n"
-            "\n"
-            "System Type:\n"
-            "  0: Raw dump\n"
-            "  1: Game Boy/Game Gear/Master System\n"
-            "  2: Genesis/Mega Drive\n"
-            "  3: Nintendo\n"
-            "  4: Super Nintendo\n"
-            "\n"
-            "Input: A valid ROM file for the <type> system.\n"
-            "Output: The file will be removed and patched.\n");
-        fprintf(stderr, "\n%s: ERROR: Missing some parameters\n", argv[0]);
-        exit(1);
+        switch (o)
+        {
+            case 'h':
+                usage(false);
+                return 0;
+            case 'i':
+                inplace = true;
+                break;
+            case 'V':
+                printf("GGGG %s\n", VERSION);
+                return 0;
+            case '?':
+                // Don't output anything -- getopt already did.
+                return 1;
+        }
     }
 
-    gg_type Type = parse_gg_type(argv[2]);
+    if ((argc - optind) != (inplace ? 3 : 4))
+    {
+        usage(true);
+        fprintf(stderr, "\n%s: ERROR: Missing some parameters\n", program);
+        return 1;
+    }
+
+    char *argv_codes = argv[optind];
+    const char *argv_system = argv[optind + 1];
+    const char *argv_input = argv[optind + 2];
+    const char *argv_output = inplace ? argv_input : argv[optind + 3];
+
+    gg_type Type = parse_gg_type(argv_system);
     if (Type == GG_TYPE_UNKNOWN)
     {
-        fprintf(stderr, "%s: %s: unknown system type\n", argv[0], argv[2]);
+        fprintf(stderr, "%s: %s: unknown system type\n", program, argv_system);
         exit(1);
     }
 
-    const char* File1 = argv[3];
-    const char* File2 = argv[4];
-    remove(File2);
-    if(!gCopyFile (File1, File2,true))
+    const char* File1 = argv_input;
+    const char* File2 = argv_output;
+    if (!inplace)
     {
-        fprintf(stderr, "%s: ERROR: ROM doesn't exists\n", argv[0]);
-        exit(1);
+        remove(File2);
+        if (!gCopyFile (File1, File2,true))
+        {
+            fprintf(stderr, "%s: ERROR: ROM doesn't exists\n", program);
+            return 1;
+        }
     }
-    Codes = split_normalize_codes(Line, argv[1]);
+
+    Codes = split_normalize_codes(Line, argv_codes);
     printf("Codes to inject: %i\n", Codes);
     const char* ext = strrchr(File1, '.');
     if (ext)
@@ -149,7 +192,7 @@ int main(int argc, char *argv[])
     printf("Patch at: %s\n", File2);
     if ((fd = open(File2, O_RDWR)) < 0)
     {
-        fprintf(stderr, "%s: Can't open file %s: %s\n", argv[0], File2, strerror(errno));
+        fprintf(stderr, "%s: Can't open file %s: %s\n", program, File2, strerror(errno));
         exit(1);
     }
     printf("\nLog:\n");
@@ -168,7 +211,7 @@ int main(int argc, char *argv[])
             printf("%s - %X:%X\n", Line[Lnum], decoded.off, decoded.rep);
             if (!modifyRaw(fd, ext, &decoded))
             {
-                fprintf(stderr, "%s: ERROR: unable to apply code\n", argv[0]);
+                fprintf(stderr, "%s: ERROR: unable to apply code\n", program);
                 continue;
             }
         }
@@ -181,7 +224,7 @@ int main(int argc, char *argv[])
             printf("%s - %X:%X\n", Line[Lnum], decoded.off, decoded.rep);
             if (!modifyGbGgMs(fd, &decoded))
             {
-                fprintf(stderr, "%s: ERROR: unable to apply code\n", argv[0]);
+                fprintf(stderr, "%s: ERROR: unable to apply code\n", program);
                 continue;
             }
         }
@@ -194,7 +237,7 @@ int main(int argc, char *argv[])
             printf("%s - %X:%X\n", Line[Lnum], decoded.off, decoded.rep);
             if (!modifyGenesis(fd, &decoded))
             {
-                fprintf(stderr, "%s: ERROR: unable to apply code\n", argv[0]);
+                fprintf(stderr, "%s: ERROR: unable to apply code\n", program);
                 continue;
             }
         }
@@ -207,7 +250,7 @@ int main(int argc, char *argv[])
             printf("%s - %X:%X:%X\n", Line[Lnum], decoded.off, decoded.cmp, decoded.rep);
             if (!modifyNES(fd, &decoded))
             {
-                fprintf(stderr, "%s: ERROR: unable to apply code\n", argv[0]);
+                fprintf(stderr, "%s: ERROR: unable to apply code\n", program);
                 continue;
             }
         }
@@ -220,7 +263,7 @@ int main(int argc, char *argv[])
             printf("%s - %X:%X\n", Line[Lnum], decoded.off, decoded.rep);
             if (!modifySNES(fd, &decoded))
             {
-                fprintf(stderr, "%s: ERROR: unable to apply code\n", argv[0]);
+                fprintf(stderr, "%s: ERROR: unable to apply code\n", program);
                 continue;
             }
         }
