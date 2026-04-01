@@ -1,0 +1,23 @@
+# GitHub actions workflow.
+# https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions
+
+name: Build+Test CI
+
+on: [push, pull_request]
+
+jobs:
+  build-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        cc: [gcc]
+    runs-on: ${{ matrix.os }}
+    env:
+      CC: ${{ matrix.cc }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install system packages
+      run: sudo apt-get install pkg-config libgtest-dev libglib2.0-dev mingw-w64
+    - run: ./compile.sh
+    - run: ./unittest
