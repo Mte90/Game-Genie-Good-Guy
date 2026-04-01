@@ -1,9 +1,11 @@
 # Game Genie Good Guy
-[![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)   
+[![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+
+TL;DR: Visit https://mte90.github.io/Game-Genie-Good-Guy/ for an online version.
 
 Game Genie Good Guy is based on Game Genie Guy:
 
-    This is a small Windows utility for applying Game Genie codes to roms. This saves you the trouble of having to enter them each time the game is played.
+> This is a small Windows utility for applying Game Genie codes to roms. This saves you the trouble of having to enter them each time the game is played.
 
 The original tool is written in BCX-BASIC and the source code is [released with the Windows executable](https://www.romhacking.net/utilities/1054/) compatible with Game Boy/Game Gear/Genesis/Mega Drive/NES/SNES roms and generate rom patched ready to be shared (or generate the IPS patch).
 
