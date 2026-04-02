@@ -58,7 +58,7 @@ bool modifyRaw(int fd, const char *ext, struct codebits *decoded)
     bool ret = false;
     int Off, Rep;
     off_t filelen;
-    char c;
+    unsigned char c;
 
     filelen = lof(fd);
 
@@ -87,7 +87,7 @@ bool modifyGbGgMs(int fd, struct codebits *decoded)
     int Num;
     int Off, Cmp, Rep;
     off_t filelen;
-    char c;
+    unsigned char c;
 
     filelen = lof(fd);
 
@@ -140,7 +140,7 @@ bool modifyGenesis(int fd, struct codebits *decoded)
     bool ret = false;
     int Off, Rep;
     off_t filelen;
-    char c;
+    unsigned char c;
 
     filelen = lof(fd);
 
@@ -167,7 +167,7 @@ bool modifyNES(int fd, struct codebits *decoded)
     int Num;
     int Off, Cmp, Rep;
     off_t filelen;
-    char c;
+    unsigned char c;
 
     filelen = lof(fd);
 
@@ -239,7 +239,7 @@ bool modifySNES(int fd, const struct codebits *decoded)
     bool ret = false;
     int Off, Rep;
     off_t filelen;
-    char c;
+    unsigned char c;
 
     filelen = lof(fd);
 
