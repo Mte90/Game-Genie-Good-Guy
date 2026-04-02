@@ -60,13 +60,11 @@ TEST_F(TempDirTest, CopyFile) {
 
 class ModifyRomTest : public TempDirTest {
  protected:
-  int getSnesLoRom(bool header = true) {
+  int getDataFile(size_t len, unsigned char fill = 0xAA) {
     // Get a tempfile of the correct length.
-    auto rom = getTmpFile();
-    int pad = header ? 512 : 0;
-    size_t len = 0x100000 + pad;
-    fs::resize_file(rom, len);
-    int fd = open(rom.c_str(), O_RDWR);
+    auto file = getTmpFile();
+    fs::resize_file(file, len);
+    int fd = open(file.c_str(), O_RDWR);
     if (fd < 0)
       return -1;
 
@@ -74,8 +72,18 @@ class ModifyRomTest : public TempDirTest {
     void *map = mmap(nullptr, len, PROT_WRITE, MAP_SHARED, fd, 0);
     if (map == nullptr)
       return -1;
-    memset(map, 0xaa, len);
+    memset(map, fill, len);
     munmap(map, len);
+
+    return fd;
+  }
+
+  int getSnesLoRom(bool header = true) {
+    // Get a tempfile of the correct length.
+    int pad = header ? 512 : 0;
+    int fd = getDataFile(0x100000 + pad);
+    if (fd < 0)
+      return fd;
 
     // Write the LoROM header.  For now we write enough for our code,
     // but this probably should be a bit more complete.
@@ -86,6 +94,30 @@ class ModifyRomTest : public TempDirTest {
     return fd;
   }
 };
+
+TEST_F(ModifyRomTest, NES) {
+  struct codebits decoded;
+  int fd = getDataFile(0x20010);
+  ASSERT_GE(fd, 0);
+  char c;
+
+  c = 0x06;
+  ASSERT_EQ(pwrite(fd, &c, 1, 0x73DD), 1);
+
+  // Apply code and verify the rom data is updated.
+  ASSERT_TRUE(decodeNES("OSKUILTA", &decoded));
+  ASSERT_TRUE(modifyNES(fd, &decoded));
+  ASSERT_EQ(pread(fd, &c, 1, 0x73DD), 1);
+  ASSERT_EQ(c, '\xD1');
+
+  // Verify other fields were not changed.
+  ASSERT_EQ(pread(fd, &c, 1, 0x13DD), 1);
+  ASSERT_EQ(c, '\xAA');
+  ASSERT_EQ(pread(fd, &c, 1, 0x33DD), 1);
+  ASSERT_EQ(c, '\xAA');
+  ASSERT_EQ(pread(fd, &c, 1, 0x53DD), 1);
+  ASSERT_EQ(c, '\xAA');
+}
 
 TEST_F(ModifyRomTest, SNES) {
   struct codebits decoded;
