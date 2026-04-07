@@ -104,6 +104,8 @@ static void usage(bool error)
         "\n"
         "Game Genie Code:\n"
         "  0: <offset>:<value> (both in hex, value is 8-bit)\n"
+        "     <offset>=<value> (higan format)\n"
+        "     <offset>=<compare>?<value>\n"
         "  1: XXX-XXX or XXX-XXX-XXX\n"
         "  2: XXXX-XXXX\n"
         "  3: XXXXXX or XXXXXXXX\n"

@@ -166,11 +166,15 @@ TEST(Decode, Raw) {
     "00:00",
     "ff:ab",
     "12345678:ee",
+    "abcd=12",
+    "4567=89?bb",
   };
   std::vector<struct codebits> exp = {
     {0, 0, 0, 0},
     {0, 0xff, 0xab, 0},
     {0, 0x12345678, 0xee, 0},
+    {0, 0xabcd, 0x12, 0},
+    {0, 0x4567, 0xbb, 0x89},
   };
   decode_tests(codes, exp, decodeRaw);
 }

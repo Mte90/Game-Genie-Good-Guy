@@ -22,17 +22,26 @@
 
 bool decodeRaw(const char *code, struct codebits *decoded)
 {
-    int addr, value;
+    int addr, value, comp = 0;
     if (sscanf(code, "%x:%x", &addr, &value) != 2)
     {
-        fprintf(stderr, "%s: raw codes must use <address>:<value> syntax\n", code);
-        return false;
+        if (sscanf(code, "%x=%x?%x", &addr, &comp, &value) != 3)
+        {
+            comp = 0;
+            if (sscanf(code, "%x=%x", &addr, &value) != 2)
+            {
+                fprintf(stderr,
+                        "%s: raw codes must use <address>:<value> or <address>=[compare?]<value> syntax\n",
+                        code);
+                return false;
+            }
+        }
     }
 
     decoded->len = 0;
     decoded->off = addr;
     decoded->rep = value;
-    decoded->cmp = 0;
+    decoded->cmp = comp;
 
     return true;
 }
