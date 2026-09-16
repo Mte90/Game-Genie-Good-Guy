@@ -138,6 +138,27 @@ TEST_F(ModifyRomTest, SNES) {
   ASSERT_EQ(c, 0);
 }
 
+TEST_F(ModifyRomTest, GbGgMs) {
+  struct codebits decoded;
+  int fd = getDataFile(0x20000);
+  ASSERT_GE(fd, 0);
+  char c;
+
+  // Compare byte the code expects, at the target offset.
+  c = 0x5E;
+  ASSERT_EQ(pwrite(fd, &c, 1, 0x4C2C), 1);
+
+  // Apply code and verify it reports success and the ROM data is updated.
+  ASSERT_TRUE(decodeGbGgMs("64C2CB913", &decoded));
+  ASSERT_TRUE(modifyGbGgMs(fd, &decoded));
+  ASSERT_EQ(pread(fd, &c, 1, 0x4C2C), 1);
+  ASSERT_EQ(c, '\x64');
+
+  // Verify a bank mirror where the compare byte doesn't match was left alone.
+  ASSERT_EQ(pread(fd, &c, 1, 0x4C2C + 8192), 1);
+  ASSERT_EQ(c, '\xAA');
+}
+
 }
 
 namespace {

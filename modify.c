@@ -122,6 +122,7 @@ bool modifyGbGgMs(int fd, struct codebits *decoded)
                     c = Rep;
                     WUR(pwrite(fd, &c, 1, Off));
                     printf("Wrote %#X to ROM offset %X\n", c, Off);
+                    ret = true;
                 }
                 else
                 {
