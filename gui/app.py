@@ -11,7 +11,7 @@ class MainWindow (QMainWindow, Ui_MainWindow):
     # Create settings for the software
     settings = QSettings('GGGG', 'Game Genie Good Guy')
     settings.setFallbacksEnabled(False)
-    version = '2.0'
+    version = '2.1'
 
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
