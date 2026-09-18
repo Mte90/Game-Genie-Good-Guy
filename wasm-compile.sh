@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -ex
-WASI_PV="32.0"
+WASI_PV="34.0"
 WASI_DIR="wasi-sdk-${WASI_PV}-x86_64-linux"
 WASI_TAR="${WASI_DIR}.tar.gz"
 
