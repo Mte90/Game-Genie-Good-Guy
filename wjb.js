@@ -378,6 +378,7 @@ const PATH_REMOVE_DIRECTORY = 33554432n;
 const PATH_UNLINK_FILE = 67108864n;
 const POLL_FD_READWRITE = 134217728n;
 const SOCK_SHUTDOWN = 268435456n;
+const SOCK_ACCEPT = 536870912n;
 
 const rights = /*#__PURE__*/Object.freeze({
 __proto__: null,
@@ -409,7 +410,8 @@ PATH_SYMLINK: PATH_SYMLINK,
 PATH_REMOVE_DIRECTORY: PATH_REMOVE_DIRECTORY,
 PATH_UNLINK_FILE: PATH_UNLINK_FILE,
 POLL_FD_READWRITE: POLL_FD_READWRITE,
-SOCK_SHUTDOWN: SOCK_SHUTDOWN
+SOCK_SHUTDOWN: SOCK_SHUTDOWN,
+SOCK_ACCEPT: SOCK_ACCEPT
 });
 
 // Copyright 2020 The ChromiumOS Authors
@@ -495,15 +497,15 @@ SYS: SYS
  * @fileoverview WASI whence API constants from wasi/api.h.
  */
 
-const CUR = 0;
-const END = 1;
-const SET = 2;
+const SET = 0;
+const CUR = 1;
+const END = 2;
 
 const whence = /*#__PURE__*/Object.freeze({
 __proto__: null,
+SET: SET,
 CUR: CUR,
-END: END,
-SET: SET
+END: END
 });
 
 // Copyright 2019 The ChromiumOS Authors
