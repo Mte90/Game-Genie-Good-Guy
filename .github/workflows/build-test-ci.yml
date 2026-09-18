@@ -40,5 +40,12 @@ jobs:
         path: GGGG-windows-x64.exe
         archive: false
 
+    - run: ./wasm-compile.sh
+    - name: Upload prebuilt (WASM)
+      uses: actions/upload-artifact@v7
+      with:
+        path: GGGG.wasm
+        archive: false
+
     # Run tests after uploading.
     - run: ./unittest
