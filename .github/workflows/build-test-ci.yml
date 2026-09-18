@@ -20,4 +20,25 @@ jobs:
     - name: Install system packages
       run: sudo apt-get install pkg-config libgtest-dev libglib2.0-dev mingw-w64
     - run: ./compile.sh
+
+    - run: mv GGGG GGGG-linux-x86_64.elf
+    - name: Upload prebuilt (Linux/x86_64)
+      uses: actions/upload-artifact@v7
+      with:
+        path: GGGG-linux-x86_64.elf
+        archive: false
+    - run: mv GGGG-w32.exe GGGG-windows-x32.exe
+    - name: Upload prebuilt (Windows/x86_32)
+      uses: actions/upload-artifact@v7
+      with:
+        path: GGGG-windows-x32.exe
+        archive: false
+    - run: mv GGGG-w64.exe GGGG-windows-x64.exe
+    - name: Upload prebuilt (Windows/x86_64)
+      uses: actions/upload-artifact@v7
+      with:
+        path: GGGG-windows-x64.exe
+        archive: false
+
+    # Run tests after uploading.
     - run: ./unittest
