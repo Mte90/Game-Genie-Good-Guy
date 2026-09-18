@@ -14,5 +14,8 @@ if ${PKG_CONFIG} --exists gtest; then
   ${CXX} ${CXXFLAGS} ${WFLAGS} ${CPPFLAGS} -g unittest.cc copyfile.c decode.c modify.c ${GLIB_LIBS} $(${PKG_CONFIG} gtest gtest_main --cflags --libs) -o unittest
 fi
 if command -v i686-w64-mingw32-gcc >/dev/null; then
-  i686-w64-mingw32-gcc ${CFLAGS} ${WFLAGS} ${CPPFLAGS} -U_FORTIFY_SOURCE GGGG.c copyfile.c decode.c modify.c -o GGGG.exe
+  i686-w64-mingw32-gcc ${CFLAGS} ${WFLAGS} ${CPPFLAGS} -U_FORTIFY_SOURCE GGGG.c copyfile.c decode.c modify.c -o GGGG-w32.exe
+fi
+if command -v x86_64-w64-mingw32-gcc >/dev/null; then
+  x86_64-w64-mingw32-gcc ${CFLAGS} ${WFLAGS} ${CPPFLAGS} -U_FORTIFY_SOURCE GGGG.c copyfile.c decode.c modify.c -o GGGG-w64.exe
 fi
