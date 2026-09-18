@@ -1,0 +1,4 @@
+[codespell]
+skip =
+  ./build/*,
+  ./wasi-sdk-*/*,

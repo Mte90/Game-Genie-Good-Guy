@@ -19,7 +19,7 @@ The idea of the new project is to get that tool (or the patching engine) running
 
 > Not all codes like being applied in this fashion. Ex: Contra Hard Corps 99 lives work fine while infinite lives does not. If you do not get the desired result try another code.
 
-> 8 digit NES codes are preferrable to 6. 8 digit codes contain validation that ensures the game is being patched in the right spot. 6 digit codes just go for it. Applying too many 6 digit codes can make a game crash. Try fewer codes if this occurs.
+> 8 digit NES codes are preferable to 6. 8 digit codes contain validation that ensures the game is being patched in the right spot. 6 digit codes just go for it. Applying too many 6 digit codes can make a game crash. Try fewer codes if this occurs.
 
 ## Steps
 
